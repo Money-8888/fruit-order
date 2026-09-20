@@ -105,16 +105,14 @@
         <button onclick="loadAdminData()" class="bg-emerald-600 text-xs px-3 py-2 rounded-lg hover:bg-emerald-500">重新整理全部</button>
       </div>
 
-      <!-- 區塊 A：當季水果上架管理（帶圖片上傳） -->
+      <!-- 區塊 A：當季水果上架管理（帶自動壓縮上傳） -->
       <div class="bg-white p-6 rounded-2xl shadow border">
         <div class="flex justify-between items-center mb-4 pb-2 border-b">
           <h3 class="font-bold text-slate-800 text-base"><i class="fa-solid fa-lemon text-amber-500 mr-2"></i>當季水果品項與照片管理</h3>
           <button onclick="addFruitRow()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold">+ 新增品項</button>
         </div>
 
-        <div class="space-y-4" id="adminFruitList">
-          <!-- 農夫水果編輯列表 -->
-        </div>
+        <div class="space-y-4" id="adminFruitList"></div>
 
         <div class="mt-6 pt-3 border-t text-right">
           <button onclick="saveFruitsToBackend()" id="saveFruitsBtn" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow">
@@ -210,7 +208,6 @@
       if (tabName === 'admin') loadAdminData();
     }
 
-    // 載入當季水果品項
     async function loadFruitsCatalog() {
       try {
         const resp = await fetch(`${GAS_API_URL}?action=getFruits`);
@@ -225,7 +222,6 @@
       }
     }
 
-    // 渲染買家選單（帶實拍照）
     function renderFruitSelection() {
       const container = document.getElementById('fruitSelectionList');
       const activeFruits = availableFruits.filter(f => f.status === 'ON');
@@ -272,9 +268,7 @@
     }
 
     function calculateCartTotal() {
-      let totalWeight = 0;
-      let totalPrice = 0;
-
+      let totalWeight = 0, totalPrice = 0;
       Object.keys(selectedCart).forEach(id => {
         const fruit = availableFruits.find(f => f.id === id);
         if (fruit) {
@@ -283,14 +277,12 @@
           totalPrice += qty * fruit.price;
         }
       });
-
       document.getElementById('totalWeightDisplay').innerText = totalWeight;
       document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString();
     }
 
     async function handleReserve(e) {
       e.preventDefault();
-      
       const itemsSummary = Object.keys(selectedCart).map(id => {
         const f = availableFruits.find(item => item.id === id);
         return `${f.name} x ${selectedCart[id]}斤`;
@@ -333,14 +325,14 @@
       }
     }
 
-    // 農夫後台：渲染品項與圖片管理
+    // 農夫後台：渲染品項
     function renderAdminFruitList() {
       const container = document.getElementById('adminFruitList');
       container.innerHTML = availableFruits.map((f, idx) => {
         const previewSrc = f.imageBase64 || f.imageUrl || '';
         const imgPreview = previewSrc 
-          ? `<img src="${previewSrc}" id="prev-${idx}" class="w-12 h-12 object-cover rounded-lg border">`
-          : `<div id="prev-${idx}" class="w-12 h-12 rounded-lg border bg-slate-100 flex items-center justify-center text-slate-400 text-xs">無圖</div>`;
+          ? `<img src="${previewSrc}" class="w-12 h-12 object-cover rounded-lg border">`
+          : `<div class="w-12 h-12 rounded-lg border bg-slate-100 flex items-center justify-center text-slate-400 text-xs">無圖</div>`;
 
         return `
           <div class="flex flex-col sm:flex-row items-center gap-3 bg-slate-50 p-3 rounded-xl border">
@@ -354,7 +346,7 @@
               </select>
               <label class="cursor-pointer bg-white border hover:bg-slate-100 text-slate-700 text-xs px-2.5 py-1.5 rounded-lg text-center flex items-center justify-center font-bold">
                 📸 選照片
-                <input type="file" accept="image/*" class="hidden" onchange="handleImageSelect(event, ${idx})">
+                <input type="file" accept="image/*" class="hidden" onchange="handleImageCompressAndSelect(event, ${idx})">
               </label>
             </div>
             <button onclick="removeFruitRow(${idx})" class="text-rose-500 hover:text-rose-700 px-2 text-xs self-end sm:self-center"><i class="fa-solid fa-trash"></i></button>
@@ -363,15 +355,35 @@
       }).join('');
     }
 
-    // 處理照片預覽轉換
-    function handleImageSelect(event, idx) {
+    // 🌟 自動照片壓縮功能 (避免 Base64 過大)
+    function handleImageCompressAndSelect(event, idx) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        availableFruits[idx].imageBase64 = e.target.result;
-        renderAdminFruitList();
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width, height = img.height;
+          const max_size = 800; // 限制最大邊長為 800px
+
+          if (width > height) {
+            if (width > max_size) { height *= max_size / width; width = max_size; }
+          } else {
+            if (height > max_size) { width *= max_size / height; height = max_size; }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // 壓縮為 JPG 格式，品質 0.7
+          availableFruits[idx].imageBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          renderAdminFruitList();
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
@@ -401,15 +413,20 @@
       }).filter(item => item.name);
 
       const btn = document.getElementById('saveFruitsBtn');
-      btn.innerText = "儲存中 (包含上傳照片)...";
+      btn.innerText = "儲存中 (上傳照片中)...";
       btn.disabled = true;
 
       try {
-        await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify({ action: "updateFruits", fruits: newList }) });
-        alert("水果品項與照片已成功儲存！");
-        loadFruitsCatalog();
+        const resp = await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify({ action: "updateFruits", fruits: newList }) });
+        const res = await resp.json();
+        if (res.result === "success") {
+          alert("水果品項與照片已成功儲存！");
+          loadFruitsCatalog();
+        } else {
+          alert("儲存失敗：" + res.message);
+        }
       } catch (e) {
-        alert("儲存失敗，請重試");
+        alert("儲存失敗，請確認 GAS 權限與連線。");
       } finally {
         btn.innerText = "儲存品項設定";
         btn.disabled = false;
