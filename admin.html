@@ -195,16 +195,21 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <!-- 改為 3 欄式：單價 / 庫存 / 狀態 -->
+          <div class="grid grid-cols-3 gap-2">
             <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">每斤單價 (元)</label>
-              <input type="number" value="${f.price}" onchange="fruitsData[${idx}].price=Number(this.value)" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg font-bold text-emerald-600 focus:ring-2 focus:ring-emerald-500 outline-none text-base">
+              <label class="block text-xs font-bold text-slate-500 mb-1">單價 (元)</label>
+              <input type="number" value="${f.price}" onchange="fruitsData[${idx}].price=Number(this.value)" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-emerald-600 text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">剩餘庫存</label>
+              <input type="number" value="${f.stock !== undefined ? f.stock : 0}" onchange="fruitsData[${idx}].stock=Number(this.value)" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 text-sm">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">上架狀態</label>
-              <select onchange="fruitsData[${idx}].status=this.value" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 bg-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
-                <option value="ON" ${f.status === 'ON' ? 'selected' : ''}>🟢 上架 (ON)</option>
-                <option value="OFF" ${f.status === 'OFF' ? 'selected' : ''}>🔴 下架 (OFF)</option>
+              <select onchange="fruitsData[${idx}].status=this.value" class="w-full px-1 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 bg-white text-sm">
+                <option value="ON" ${f.status === 'ON' ? 'selected' : ''}>🟢 上架</option>
+                <option value="OFF" ${f.status === 'OFF' ? 'selected' : ''}>🔴 下架</option>
               </select>
             </div>
           </div>
@@ -222,6 +227,7 @@
         id: "F" + (fruitsData.length + 1),
         name: "新品水果",
         price: 100,
+        stock: 50,
         status: "ON",
         imageUrl: ""
       });
