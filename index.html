@@ -85,7 +85,7 @@
   </main>
 
   <script>
-    // ⚠️ 貼上您的 GAS 部署網址
+    // ⚠️ 您的 GAS 部署網址
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxQsDLOyagMbYOOw-uYBozoZXRRq5fmEutsZCn0Q3DjtNjq9Uf10PQ7zMsXETsy0UKf/exec";
 
     let fruitsData = [];
@@ -118,6 +118,7 @@
       }
     }
 
+    // 💡 渲染商品列表（含庫存數量與售完邏輯）
     function renderShopFruits() {
       const container = document.getElementById('shop-fruit-list');
       const activeFruits = fruitsData.filter(f => f.status === 'ON');
@@ -127,44 +128,71 @@
         return;
       }
 
-      container.innerHTML = activeFruits.map(fruit => `
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
-          <div class="h-48 bg-slate-100 relative overflow-hidden">
-            ${fruit.imageUrl 
-              ? `<img src="${fruit.imageUrl}" class="w-full h-full object-cover">` 
-              : `<div class="w-full h-full flex items-center justify-center text-slate-300 text-4xl">🍎</div>`}
-          </div>
-          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-lg font-bold text-slate-800">${fruit.name}</h3>
-              <p class="text-emerald-600 font-extrabold text-xl mt-1">$${fruit.price} <span class="text-xs text-slate-400 font-normal">/ 斤</span></p>
+      container.innerHTML = activeFruits.map(fruit => {
+        // 讀取庫存 (若沒設定庫存預設為 0)
+        const stock = fruit.stock !== undefined ? Number(fruit.stock) : 0;
+        const isSoldOut = stock <= 0;
+
+        return `
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition ${isSoldOut ? 'opacity-80' : ''}">
+            <div class="h-48 bg-slate-100 relative overflow-hidden">
+              ${fruit.imageUrl 
+                ? `<img src="${fruit.imageUrl}" class="w-full h-full object-cover">` 
+                : `<div class="w-full h-full flex items-center justify-center text-slate-300 text-4xl">🍎</div>`}
+              
+              <!-- 💡 剩餘庫存標籤 -->
+              <div class="absolute top-3 right-3">
+                ${isSoldOut 
+                  ? `<span class="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">已售完</span>`
+                  : `<span class="bg-emerald-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">剩餘 ${stock} 斤</span>`
+                }
+              </div>
             </div>
-            
-            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
-              <span class="text-xs font-bold text-slate-500 pl-2">數量(斤)</span>
-              <div class="flex items-center space-x-2">
-                <button onclick="updateCart('${fruit.id}', -1)" class="w-8 h-8 rounded-lg bg-white border shadow-sm font-bold text-slate-600 hover:bg-slate-100">-</button>
-                <span id="qty-${fruit.id}" class="w-8 text-center font-bold">${cart[fruit.id] || 0}</span>
-                <button onclick="updateCart('${fruit.id}', 1)" class="w-8 h-8 rounded-lg bg-white border shadow-sm font-bold text-slate-600 hover:bg-slate-100">+</button>
+
+            <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+              <div>
+                <h3 class="text-lg font-bold text-slate-800">${fruit.name}</h3>
+                <p class="text-emerald-600 font-extrabold text-xl mt-1">$${fruit.price} <span class="text-xs text-slate-400 font-normal">/ 斤</span></p>
+              </div>
+              
+              <!-- 💡 數量調整區 (售完時禁用) -->
+              <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
+                <span class="text-xs font-bold text-slate-500 pl-2">數量(斤)</span>
+                <div class="flex items-center space-x-2">
+                  <button onclick="updateCart('${fruit.id}', -1)" ${isSoldOut ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-white border shadow-sm font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed">-</button>
+                  <span id="qty-${fruit.id}" class="w-8 text-center font-bold">${cart[fruit.id] || 0}</span>
+                  <button onclick="updateCart('${fruit.id}', 1)" ${isSoldOut ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-white border shadow-sm font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed">+</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
+    // 💡 加減購物車數量（檢查庫存上限）
     function updateCart(fruitId, delta) {
+      const fruit = fruitsData.find(f => f.id === fruitId);
+      if (!fruit) return;
+
+      const stock = fruit.stock !== undefined ? Number(fruit.stock) : 0;
       const currentQty = cart[fruitId] || 0;
-      const newQty = Math.max(0, currentQty + delta);
-      
-      if (newQty === 0) {
+      const newQty = currentQty + delta;
+
+      // 檢查是否超過庫存
+      if (delta > 0 && newQty > stock) {
+        alert(`【${fruit.name}】目前剩餘庫存只有 ${stock} 斤喔！`);
+        return;
+      }
+
+      if (newQty <= 0) {
         delete cart[fruitId];
       } else {
         cart[fruitId] = newQty;
       }
 
       const qtyElem = document.getElementById(`qty-${fruitId}`);
-      if (qtyElem) qtyElem.innerText = newQty;
+      if (qtyElem) qtyElem.innerText = cart[fruitId] || 0;
 
       renderCartSummary();
     }
