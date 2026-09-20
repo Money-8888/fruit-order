@@ -2,108 +2,92 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阿咘奶粉錢後台管理系統</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>阿咘奶粉錢後台管理系統 (手機優化版)</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
-  <!-- 頂部欄 -->
-  <header class="bg-slate-800 text-white shadow-md">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center space-x-2">
-        <span class="text-2xl">👨‍🌾</span>
-        <h1 class="text-xl font-bold">鮮果嚴選 - 農夫管理後台</h1>
+  <!-- 頂部導覽列 (手機響應式) -->
+  <header class="bg-slate-800 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
+      <div class="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-start">
+        <div class="flex items-center space-x-2">
+          <span class="text-2xl">👨‍🌾</span>
+          <h1 class="text-lg font-bold">阿咘奶粉錢管理後台</h1>
+        </div>
+        <!-- 手機版登出按鈕 -->
+        <button id="btn-logout-mobile" onclick="handleLogout()" class="hidden text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg text-white font-bold sm:hidden">登出</button>
       </div>
       
       <!-- 右側按鈕區 -->
-      <div class="flex items-center space-x-3">
-        <!-- 💡 連結到顧客前台 (預設開新分頁) -->
+      <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
         <a href="./index.html" target="_blank" class="text-xs bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded-lg text-white font-bold transition flex items-center space-x-1 shadow-sm">
           <span>🛒</span>
-          <span>查看顧客前台</span>
+          <span>查看前台</span>
         </a>
-        <button id="btn-logout" onclick="handleLogout()" class="hidden text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg text-white font-bold transition">登出系統</button>
+        <button id="btn-logout-desktop" onclick="handleLogout()" class="hidden sm:inline-block text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg text-white font-bold transition">登出系統</button>
       </div>
     </div>
   </header>
-  <main class="max-w-6xl mx-auto px-4 py-8">
+
+  <main class="max-w-4xl mx-auto px-3 py-4 sm:px-4 sm:py-6">
 
     <!-- 1. 登入區塊 -->
-    <div id="admin-login-box" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-slate-200 mt-12">
+    <div id="admin-login-box" class="max-w-md mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-200 mt-6 sm:mt-12">
       <div class="text-center mb-6">
         <span class="text-4xl">🔐</span>
-        <h2 class="text-2xl font-bold text-slate-800 mt-2">管理員身分驗證</h2>
+        <h2 class="text-2xl font-bold text-slate-800 mt-2">管理員驗證</h2>
         <p class="text-sm text-slate-500">請輸入後台帳號密碼</p>
       </div>
       <form onsubmit="handleLogin(event)" class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">帳號</label>
-          <input type="text" id="login-user" value="farmer" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+          <input type="text" id="login-user" value="farmer" required class="w-full px-3 py-2.5 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-base">
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">密碼</label>
-          <input type="password" id="login-pass" placeholder="預設 888888" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+          <input type="password" id="login-pass" placeholder="預設 888888" required class="w-full px-3 py-2.5 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-base">
         </div>
-        <button type="submit" id="btn-login" class="w-full bg-slate-800 text-white font-bold py-2.5 rounded-lg hover:bg-slate-900 transition">登入系統</button>
+        <button type="submit" id="btn-login" class="w-full bg-slate-800 text-white font-bold py-3 rounded-xl hover:bg-slate-900 active:scale-[0.98] transition text-base shadow-md">登入系統</button>
       </form>
     </div>
 
     <!-- 2. 管理面板 (登入後顯示) -->
-    <div id="admin-panel" class="hidden space-y-6">
+    <div id="admin-panel" class="hidden space-y-4">
       
-      <!-- 分頁切換 -->
-      <div class="flex space-x-2 border-b border-slate-200 pb-2">
-        <button onclick="switchTab('fruits')" id="tab-btn-fruits" class="px-4 py-2 rounded-lg font-bold bg-emerald-600 text-white">🍎 水果商品管理</button>
-        <button onclick="switchTab('orders')" id="tab-btn-orders" class="px-4 py-2 rounded-lg font-bold bg-white text-slate-600 hover:bg-slate-50">📋 訂單紀錄檢視</button>
+      <!-- 分頁切換 (手機大按鈕) -->
+      <div class="grid grid-cols-2 gap-2 bg-slate-200 p-1 rounded-xl">
+        <button onclick="switchTab('fruits')" id="tab-btn-fruits" class="py-2.5 text-center rounded-lg font-bold text-sm bg-emerald-600 text-white shadow-sm transition">🍎 水果品項管理</button>
+        <button onclick="switchTab('orders')" id="tab-btn-orders" class="py-2.5 text-center rounded-lg font-bold text-sm text-slate-600 hover:bg-slate-100 transition">📋 訂單紀錄檢視</button>
       </div>
 
-      <!-- 水果商品管理 -->
-      <div id="panel-fruits" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
-        <div class="flex justify-between items-center">
-          <h3 class="text-xl font-bold text-slate-800">水果商品清單設定</h3>
-          <div class="space-x-2">
-            <button onclick="addNewFruitRow()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-bold">+ 新增水果品項</button>
-            <button onclick="saveFruitsToBackend()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold shadow-sm">儲存全部更新</button>
+      <!-- A. 水果商品管理 (手機卡片區塊) -->
+      <div id="panel-fruits" class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
+          <h3 class="text-lg font-bold text-slate-800">水果商品清單</h3>
+          <div class="flex space-x-2 w-full sm:w-auto">
+            <button onclick="addNewFruitRow()" class="flex-1 sm:flex-none px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold border">+ 新增水果</button>
+            <button onclick="saveFruitsToBackend()" class="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm">💾 儲存更新</button>
           </div>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="border-b bg-slate-50 text-slate-600 text-sm">
-                <th class="p-3">圖片</th>
-                <th class="p-3">水果名稱</th>
-                <th class="p-3">每斤單價 (元)</th>
-                <th class="p-3">上架狀態</th>
-                <th class="p-3">上傳/更換圖片</th>
-              </tr>
-            </thead>
-            <tbody id="admin-fruit-table-body" class="divide-y text-sm"></tbody>
-          </table>
+        <!-- 水果手機卡片容器 -->
+        <div id="admin-fruit-container" class="space-y-4">
+          <div class="text-center py-8 text-slate-400">正在載入水果資料...</div>
         </div>
       </div>
 
-      <!-- 訂單紀錄 -->
-      <div id="panel-orders" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-        <div class="flex justify-between items-center">
-          <h3 class="text-xl font-bold text-slate-800">最新訂單列表</h3>
-          <button onclick="loadAdminOrders()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm">🔄 重新整理</button>
+      <!-- B. 訂單紀錄檢視 (手機卡片區塊) -->
+      <div id="panel-orders" class="hidden bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <div class="flex justify-between items-center border-b pb-3">
+          <h3 class="text-lg font-bold text-slate-800">最新訂單列表</h3>
+          <button onclick="loadAdminOrders()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold">🔄 重新整理</button>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="border-b bg-slate-50 text-slate-600 text-sm">
-                <th class="p-3">訂單編號/時間</th>
-                <th class="p-3">訂購人資訊</th>
-                <th class="p-3">訂購品項</th>
-                <th class="p-3">總金額</th>
-                <th class="p-3">處理狀態</th>
-              </tr>
-            </thead>
-            <tbody id="admin-order-table-body" class="divide-y text-sm"></tbody>
-          </table>
+        <!-- 訂單手機卡片容器 -->
+        <div id="admin-order-container" class="space-y-4">
+          <div class="text-center py-8 text-slate-400">正在載入訂單資料...</div>
         </div>
       </div>
 
@@ -112,7 +96,7 @@
   </main>
 
   <script>
-    // ⚠️ 貼上您的 GAS 部署網址
+    // ⚠️ 請替換為您的 GAS 部署網址
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxQsDLOyagMbYOOw-uYBozoZXRRq5fmEutsZCn0Q3DjtNjq9Uf10PQ7zMsXETsy0UKf/exec";
 
     let fruitsData = [];
@@ -140,7 +124,8 @@
       const isLoggedIn = sessionStorage.getItem("isFarmerLogin") === "true";
       document.getElementById('admin-login-box').classList.toggle('hidden', isLoggedIn);
       document.getElementById('admin-panel').classList.toggle('hidden', !isLoggedIn);
-      document.getElementById('btn-logout').classList.toggle('hidden', !isLoggedIn);
+      document.getElementById('btn-logout-mobile').classList.toggle('hidden', !isLoggedIn);
+      document.getElementById('btn-logout-desktop').classList.toggle('hidden', !isLoggedIn);
       
       if (isLoggedIn) {
         loadFruits();
@@ -178,8 +163,8 @@
       document.getElementById('panel-fruits').classList.toggle('hidden', tab !== 'fruits');
       document.getElementById('panel-orders').classList.toggle('hidden', tab !== 'orders');
 
-      document.getElementById('tab-btn-fruits').className = tab === 'fruits' ? "px-4 py-2 rounded-lg font-bold bg-emerald-600 text-white" : "px-4 py-2 rounded-lg font-bold bg-white text-slate-600 hover:bg-slate-50";
-      document.getElementById('tab-btn-orders').className = tab === 'orders' ? "px-4 py-2 rounded-lg font-bold bg-emerald-600 text-white" : "px-4 py-2 rounded-lg font-bold bg-white text-slate-600 hover:bg-slate-50";
+      document.getElementById('tab-btn-fruits').className = tab === 'fruits' ? "py-2.5 text-center rounded-lg font-bold text-sm bg-emerald-600 text-white shadow-sm transition" : "py-2.5 text-center rounded-lg font-bold text-sm text-slate-600 hover:bg-slate-100 transition";
+      document.getElementById('tab-btn-orders').className = tab === 'orders' ? "py-2.5 text-center rounded-lg font-bold text-sm bg-emerald-600 text-white shadow-sm transition" : "py-2.5 text-center rounded-lg font-bold text-sm text-slate-600 hover:bg-slate-100 transition";
     }
 
     async function loadFruits() {
@@ -190,29 +175,43 @@
       }
     }
 
+    // 💡 渲染水果卡片 (手機友善 UI)
     function renderAdminFruits() {
-      const tbody = document.getElementById('admin-fruit-table-body');
-      tbody.innerHTML = fruitsData.map((f, idx) => `
-        <tr data-id="${f.id}">
-          <td class="p-3">
-            <img id="img-preview-${idx}" src="${f.imageUrl || ''}" class="w-12 h-12 object-cover rounded-lg bg-slate-100 border">
-          </td>
-          <td class="p-3">
-            <input type="text" value="${f.name}" onchange="fruitsData[${idx}].name=this.value" class="px-2 py-1 border rounded w-full">
-          </td>
-          <td class="p-3">
-            <input type="number" value="${f.price}" onchange="fruitsData[${idx}].price=Number(this.value)" class="px-2 py-1 border rounded w-24">
-          </td>
-          <td class="p-3">
-            <select onchange="fruitsData[${idx}].status=this.value" class="px-2 py-1 border rounded">
-              <option value="ON" ${f.status === 'ON' ? 'selected' : ''}>上架 (ON)</option>
-              <option value="OFF" ${f.status === 'OFF' ? 'selected' : ''}>下架 (OFF)</option>
-            </select>
-          </td>
-          <td class="p-3">
-            <input type="file" accept="image/*" onchange="uploadFruitImage(this, ${idx})" class="text-xs text-slate-500">
-          </td>
-        </tr>
+      const container = document.getElementById('admin-fruit-container');
+      if (fruitsData.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-400">目前尚無水果資料</div>`;
+        return;
+      }
+
+      container.innerHTML = fruitsData.map((f, idx) => `
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 relative shadow-sm" data-id="${f.id}">
+          <div class="flex items-center space-x-3">
+            <img id="img-preview-${idx}" src="${f.imageUrl || ''}" class="w-16 h-16 object-cover rounded-xl bg-slate-200 border flex-shrink-0">
+            <div class="flex-1 space-y-1">
+              <label class="block text-xs font-bold text-slate-500">水果名稱</label>
+              <input type="text" value="${f.name}" onchange="fruitsData[${idx}].name=this.value" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none text-base">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">每斤單價 (元)</label>
+              <input type="number" value="${f.price}" onchange="fruitsData[${idx}].price=Number(this.value)" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg font-bold text-emerald-600 focus:ring-2 focus:ring-emerald-500 outline-none text-base">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">上架狀態</label>
+              <select onchange="fruitsData[${idx}].status=this.value" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 bg-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                <option value="ON" ${f.status === 'ON' ? 'selected' : ''}>🟢 上架 (ON)</option>
+                <option value="OFF" ${f.status === 'OFF' ? 'selected' : ''}>🔴 下架 (OFF)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">更換圖片 (可直接拍照)</label>
+            <input type="file" accept="image/*" onchange="uploadFruitImage(this, ${idx})" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+          </div>
+        </div>
       `).join('');
     }
 
@@ -239,7 +238,7 @@
         if (res.status === "success") {
           fruitsData[idx].imageUrl = res.url;
           document.getElementById(`img-preview-${idx}`).src = res.url;
-          alert("圖片上傳成功！請記得點擊「儲存全部更新」");
+          alert("圖片上傳成功！請記得點擊「儲存更新」");
         } else {
           alert("圖片上傳失敗：" + res.message);
         }
@@ -280,35 +279,46 @@
       return itemsStr;
     }
 
+    // 💡 渲染訂單卡片 (手機友善 UI)
     function renderAdminOrders(orders) {
-      const tbody = document.getElementById('admin-order-table-body');
+      const container = document.getElementById('admin-order-container');
       if (orders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">尚無訂單資料</td></tr>`;
+        container.innerHTML = `<div class="text-center py-8 text-slate-400">尚無訂單資料</div>`;
         return;
       }
 
-      tbody.innerHTML = orders.map(o => `
-        <tr class="hover:bg-slate-50">
-          <td class="p-3">
-            <div class="font-bold text-emerald-700">${o.orderId}</div>
-            <div class="text-xs text-slate-400">${o.time}</div>
-          </td>
-          <td class="p-3">
-            <div class="font-bold">${o.name} (${o.phone})</div>
-            <div class="text-xs text-slate-500">${o.address}</div>
-          </td>
-          <td class="p-3 text-xs bg-slate-50 rounded">${formatOrderItems(o.items)}</td>
-          <td class="p-3 font-bold text-emerald-600">$${o.totalAmount}</td>
-          <td class="p-3">
-            <select onchange="changeOrderStatus('${o.orderId}', this.value)" class="px-2 py-1 text-xs rounded border border-slate-300 bg-white font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-              <option value="待處理" ${o.status === '待處理' ? 'selected' : ''}>待處理</option>
-              <option value="處理中" ${o.status === '處理中' ? 'selected' : ''}>處理中</option>
-              <option value="已出貨" ${o.status === '已出貨' ? 'selected' : ''}>已出貨</option>
-              <option value="已完成" ${o.status === '已完成' ? 'selected' : ''}>已完成</option>
-              <option value="已取消" ${o.status === '已取消' ? 'selected' : ''}>已取消</option>
-            </select>
-          </td>
-        </tr>
+      container.innerHTML = orders.map(o => `
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+          <div class="flex justify-between items-start border-b border-slate-200 pb-2">
+            <div>
+              <div class="font-bold text-emerald-700 text-base">${o.orderId}</div>
+              <div class="text-xs text-slate-400">${o.time}</div>
+            </div>
+            <div>
+              <select onchange="changeOrderStatus('${o.orderId}', this.value)" class="px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white font-bold text-slate-700 focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm">
+                <option value="待處理" ${o.status === '待處理' ? 'selected' : ''}>⏳ 待處理</option>
+                <option value="處理中" ${o.status === '處理中' ? 'selected' : ''}>⚙️ 處理中</option>
+                <option value="已出貨" ${o.status === '已出貨' ? 'selected' : ''}>🚚 已出貨</option>
+                <option value="已完成" ${o.status === '已完成' ? 'selected' : ''}>✅ 已完成</option>
+                <option value="已取消" ${o.status === '已取消' ? 'selected' : ''}>❌ 已取消</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="space-y-1 text-sm">
+            <div class="font-bold text-slate-800">${o.name} <span class="text-slate-500 font-normal">(${o.phone})</span></div>
+            <div class="text-xs text-slate-500">📍 ${o.address}</div>
+          </div>
+
+          <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1">
+            <div class="font-bold text-slate-500 mb-1">📦 訂購品項：</div>
+            <div>${formatOrderItems(o.items)}</div>
+          </div>
+
+          <div class="text-right font-bold text-base text-emerald-600">
+            總金額：$${o.totalAmount} 元
+          </div>
+        </div>
       `).join('');
     }
 
