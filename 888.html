@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>山麓果園 - 產地直銷預約訂購系統</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans">
+
+  <!-- 頂部導航 -->
+  <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-2 cursor-pointer" onclick="switchTab('home')">
+        <i class="fa-solid font-bold fa-lemon text-amber-300 text-2xl"></i>
+        <span class="font-bold text-xl tracking-wide">山麓果園</span>
+      </div>
+      <nav class="flex space-x-3 text-sm">
+        <button onclick="switchTab('home')" class="hover:bg-emerald-800 px-3 py-1.5 rounded-lg transition">當季預約</button>
+        <button onclick="switchTab('search')" class="hover:bg-emerald-800 px-3 py-1.5 rounded-lg transition">查詢訂單</button>
+        <button onclick="switchTab('admin')" class="bg-emerald-900 hover:bg-black px-3 py-1.5 rounded-lg transition text-emerald-200">農夫後台</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-6">
+
+    <!-- 頁面一：首頁與下單預約區 (HOME) -->
+    <section id="tab-home" class="space-y-6">
+      <!-- Banner -->
+      <div class="bg-gradient-to-r from-emerald-600 to-teal-800 text-white rounded-2xl p-6 md:p-10 shadow-lg relative overflow-hidden">
+        <div class="relative z-10 max-w-xl">
+          <span class="bg-amber-400 text-slate-900 text-xs font-bold px-2.5 py-1 rounded-full uppercase">100% 草生栽培</span>
+          <h1 class="text-3xl md:text-4xl font-extrabold mt-3 leading-tight">屏東外銷級黑金剛蓮霧<br>當季新鮮採收預約中</h1>
+          <p class="mt-2 text-emerald-100 text-sm md:text-base">先預約、後採收！品質產量確定後才通知付款，給您最安心的產地直購體驗。</p>
+        </div>
+      </div>
+
+      <!-- 核心賣點 -->
+      <div class="grid grid-cols-3 gap-3 text-center">
+        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+          <i class="fa-solid fa-seedling text-emerald-600 text-xl mb-1"></i>
+          <p class="text-xs font-bold">減農藥草生栽培</p>
+        </div>
+        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+          <i class="fa-solid fa-snowflake text-blue-500 text-xl mb-1"></i>
+          <p class="text-xs font-bold">黑貓冷藏直送</p>
+        </div>
+        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+          <i class="fa-solid fa-hand-holding-heart text-rose-500 text-xl mb-1"></i>
+          <p class="text-xs font-bold">壞果開箱理賠保障</p>
+        </div>
+      </div>
+
+      <!-- 商品預約表單卡片 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4 pb-2 border-b flex items-center">
+          <i class="fa-solid fa-basket-shopping text-emerald-600 mr-2"></i>選擇預購規格
+        </h2>
+        
+        <div class="space-y-4">
+          <!-- 規格一 -->
+          <label class="flex items-center justify-between p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50/30 cursor-pointer">
+            <div class="flex items-center space-x-3">
+              <input type="radio" name="productSpec" value="禮盒裝 (6台斤)" data-price="900" checked class="w-4 h-4 text-emerald-600">
+              <div>
+                <p class="font-bold text-slate-900">頂級外銷級禮盒裝 (6台斤 / 箱)</p>
+                <p class="text-xs text-slate-500">大果實，送禮首選，極致甜度</p>
+              </div>
+            </div>
+            <span class="font-bold text-emerald-700">NT$ 900</span>
+          </label>
+
+          <!-- 規格二 -->
+          <label class="flex items-center justify-between p-4 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-emerald-300">
+            <div class="flex items-center space-x-3">
+              <input type="radio" name="productSpec" value="家庭分享箱 (10台斤)" data-price="1200" class="w-4 h-4 text-emerald-600">
+              <div>
+                <p class="font-bold text-slate-900">超值家庭分享箱 (10台斤 / 箱)</p>
+                <p class="text-xs text-slate-500">果實大小適中，全家享用最划算</p>
+              </div>
+            </div>
+            <span class="font-bold text-emerald-700">NT$ 1,200</span>
+          </label>
+
+          <!-- 數量選擇 -->
+          <div class="flex justify-between items-center pt-2">
+            <span class="font-bold text-sm">訂購數量：</span>
+            <div class="flex items-center space-x-3">
+              <button type="button" onclick="adjustQty(-1)" class="w-8 h-8 bg-slate-100 rounded-lg font-bold">-</button>
+              <span id="orderQty" class="font-bold text-lg">1</span>
+              <button type="button" onclick="adjustQty(1)" class="w-8 h-8 bg-slate-100 rounded-lg font-bold">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 買家資料填寫 -->
+        <h3 class="text-base font-bold text-slate-900 mt-6 mb-3">訂購人預約資訊（免預付）</h3>
+        <form id="reservationForm" onsubmit="handleReserve(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">姓名 *</label>
+            <input type="text" id="custName" required placeholder="請輸入收件人姓名" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">行動電話 *</label>
+            <input type="tel" id="custPhone" required placeholder="0912345678" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">電子信箱 Email（接收採收與付款通知）*</label>
+            <input type="email" id="custEmail" required placeholder="example@gmail.com" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">冷藏配送地址 *</label>
+            <input type="text" id="custAddress" required placeholder="請填寫完整配送地址" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+
+          <div class="pt-4 border-t flex justify-between items-center">
+            <div>
+              <p class="text-xs text-slate-500">預計總金額</p>
+              <p class="text-xl font-extrabold text-emerald-700">NT$ <span id="totalPrice">900</span></p>
+            </div>
+            <button type="submit" id="submitBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition">
+              確認免費預約排單
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 頁面二：查詢訂單 (SEARCH) -->
+    <section id="tab-search" class="hidden space-y-4">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border">
+        <h2 class="text-xl font-bold mb-3">訂單進度查詢</h2>
+        <div class="flex gap-2">
+          <input type="text" id="searchInput" placeholder="輸入手機號碼 或 訂單編號" class="flex-1 px-4 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+          <button onclick="searchOrders()" class="bg-emerald-600 text-white px-5 py-2 rounded-xl font-bold hover:bg-emerald-700">查詢</button>
+        </div>
+      </div>
+
+      <!-- 查詢結果區域 -->
+      <div id="searchResult" class="space-y-3"></div>
+    </section>
+
+    <!-- 頁面三：農夫管理後台 (ADMIN) -->
+    <section id="tab-admin" class="hidden space-y-4">
+      <div class="bg-slate-900 text-white p-4 rounded-2xl flex justify-between items-center">
+        <div>
+          <h2 class="text-lg font-bold">農夫果園管理後台</h2>
+          <p class="text-xs text-slate-400">管理預約單、發送付款通知與黑貓單據匯出</p>
+        </div>
+        <button onclick="loadAdminOrders()" class="bg-emerald-600 text-xs px-3 py-2 rounded-lg hover:bg-emerald-500">重新整理</button>
+      </div>
+
+      <div class="overflow-x-auto bg-white rounded-xl shadow border">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-100 border-b">
+            <tr>
+              <th class="p-3">單號/時間</th>
+              <th class="p-3">客戶資訊</th>
+              <th class="p-3">品項金額</th>
+              <th class="p-3">狀態</th>
+              <th class="p-3">操作按鈕</th>
+            </tr>
+          </thead>
+          <tbody id="adminOrderTable" class="divide-y">
+            <tr><td colspan="5" class="p-4 text-center text-slate-400">點擊重新整理載入訂單...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 頁面四：專屬付款頁 (PAYMENT MODAL/VIEW) -->
+    <section id="tab-pay" class="hidden space-y-4">
+      <div class="bg-white p-6 rounded-2xl shadow-lg border max-w-lg mx-auto">
+        <div class="text-center pb-4 border-b">
+          <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">採收完成通知</span>
+          <h2 class="text-2xl font-bold mt-2">完成水果訂單付款</h2>
+          <p class="text-xs text-slate-500 mt-1">單號：<span id="payOrderIdDisplay" class="font-mono"></span></p>
+        </div>
+
+        <div class="py-4 space-y-3 text-sm">
+          <div class="flex justify-between text-slate-600">
+            <span>訂購品項：</span>
+            <span id="payItemsDisplay" class="font-bold text-slate-900"></span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>應付總金額：</span>
+            <span id="payAmountDisplay" class="text-lg font-bold text-emerald-600"></span>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-xl border mt-4 space-y-2">
+            <p class="font-bold text-slate-800 border-b pb-1">匯款銀行帳號 (ATM / 網銀)</p>
+            <p class="text-xs">銀行：(700) 中華郵政</p>
+            <p class="text-xs">帳號：<span class="font-mono text-emerald-700 font-bold">0001234-0987654</span></p>
+            <p class="text-xs">戶名：山麓果園 (張小農)</p>
+          </div>
+
+          <form onsubmit="handlePaySubmit(event)" class="mt-4 space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">轉帳帳號末五碼 / 備註：</label>
+              <input type="text" id="payNote" required placeholder="例如：末五碼 12345 或 已 LINE Pay" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow">
+              確認已完成轉帳
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ==========================================
+    // 設定 API 網址 (請換成你 Apps Script 部署的 Web App URL)
+    // ==========================================
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxrXQ6c375eVKxgP6HCzUBfC8deFDdZxZw90RZIwxprGyLt6o32DyhaPIpBxcrtFmEj/exec";
+
+    let currentQty = 1;
+
+    // 初始化與網址網址參數判斷
+    window.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get("orderId");
+      const mode = urlParams.get("mode");
+
+      if (orderId && mode === "pay") {
+        openPayTab(orderId);
+      } else if (orderId) {
+        switchTab('search');
+        document.getElementById('searchInput').value = orderId;
+        searchOrders();
+      }
+    });
+
+    // 切換 Tab 頁面
+    function switchTab(tabName) {
+      ['home', 'search', 'admin', 'pay'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+      });
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+    }
+
+    // 調整數量與計算價格
+    function adjustQty(delta) {
+      currentQty = Math.max(1, currentQty + delta);
+      document.getElementById('orderQty').innerText = currentQty;
+      updatePrice();
+    }
+
+    function updatePrice() {
+      const selectedSpec = document.querySelector('input[name="productSpec"]:checked');
+      const unitPrice = parseInt(selectedSpec.getAttribute('data-price'));
+      document.getElementById('totalPrice').innerText = (unitPrice * currentQty).toLocaleString();
+    }
+
+    document.querySelectorAll('input[name="productSpec"]').forEach(radio => {
+      radio.addEventListener('change', updatePrice);
+    });
+
+    // 買家送出預約單
+    async function handleReserve(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerText = "提交預約中...";
+
+      const selectedSpec = document.querySelector('input[name="productSpec"]:checked').value;
+      const unitPrice = parseInt(document.querySelector('input[name="productSpec"]:checked').getAttribute('data-price'));
+      
+      const payload = {
+        action: "createOrder",
+        name: document.getElementById('custName').value,
+        phone: document.getElementById('custPhone').value,
+        email: document.getElementById('custEmail').value,
+        address: document.getElementById('custAddress').value,
+        items: `${selectedSpec} x ${currentQty}`,
+        totalAmount: unitPrice * currentQty
+      };
+
+      try {
+        const resp = await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const res = await resp.json();
+        if (res.result === "success") {
+          alert(`🎉 預約成功！\n您的預約單號為：${res.orderId}\n採收後我們將以 Email 發送付款連結通知。`);
+          document.getElementById('reservationForm').reset();
+          switchTab('search');
+          document.getElementById('searchInput').value = res.orderId;
+          searchOrders();
+        } else {
+          alert("預約失敗：" + res.message);
+        }
+      } catch (err) {
+        alert("連線失敗，請檢查網路或 API 設定。");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "確認免費預約排單";
+      }
+    }
+
+    // 買家查詢訂單
+    async function searchOrders() {
+      const q = document.getElementById('searchInput').value.trim();
+      if (!q) return alert("請輸入手機號碼或訂單編號");
+
+      const resDiv = document.getElementById('searchResult');
+      resDiv.innerHTML = '<p class="text-center text-slate-400 py-4">查詢中...</p>';
+
+      try {
+        const resp = await fetch(`${GAS_API_URL}?action=searchOrder&query=${encodeURIComponent(q)}`);
+        const data = await resp.json();
+
+        if (data.orders && data.orders.length > 0) {
+          resDiv.innerHTML = data.orders.map(o => `
+            <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-2">
+              <div class="flex justify-between items-center border-b pb-2">
+                <span class="font-mono font-bold text-slate-800">${o.orderId}</span>
+                ${getStatusBadge(o.status)}
+              </div>
+              <div class="text-xs space-y-1 text-slate-600">
+                <p>訂購品項：${o.items}</p>
+                <p>金額：NT$ ${o.totalAmount}</p>
+                <p>訂購人：${o.name}</p>
+                <p>時間：${o.date}</p>
+                ${o.trackingCode ? `<p class="text-emerald-600 font-bold">黑貓追蹤碼：${o.trackingCode}</p>` : ''}
+              </div>
+              ${o.status === 'WAIT_PAYMENT' ? `
+                <button onclick="openPayTab('${o.orderId}')" class="w-full bg-amber-500 text-white font-bold py-2 rounded-xl text-xs mt-2">
+                  進入付款頁面
+                </button>
+              ` : ''}
+            </div>
+          `).join('');
+        } else {
+          resDiv.innerHTML = '<p class="text-center text-slate-500 py-4">查無相關訂單</p>';
+        }
+      } catch (err) {
+        resDiv.innerHTML = '<p class="text-center text-rose-500 py-4">查詢發生錯誤</p>';
+      }
+    }
+
+    // 農夫後台：載入所有訂單
+    async function loadAdminOrders() {
+      const tbody = document.getElementById('adminOrderTable');
+      tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">載入中...</td></tr>';
+
+      try {
+        const resp = await fetch(`${GAS_API_URL}?action=getAllOrders`);
+        const data = await resp.json();
+
+        if (data.orders) {
+          tbody.innerHTML = data.orders.map(o => `
+            <tr class="hover:bg-slate-50">
+              <td class="p-3">
+                <div class="font-mono font-bold">${o.orderId}</div>
+                <div class="text-slate-400 text-[10px]">${o.date}</div>
+              </td>
+              <td class="p-3">
+                <div class="font-bold">${o.name} (${o.phone})</div>
+                <div class="text-slate-400 text-[10px]">${o.address}</div>
+              </td>
+              <td class="p-3">
+                <div>${o.items}</div>
+                <div class="font-bold text-emerald-700">NT$ ${o.totalAmount}</div>
+              </td>
+              <td class="p-3">${getStatusBadge(o.status)}</td>
+              <td class="p-3 space-y-1">
+                ${o.status === 'RESERVED' ? `
+                  <button onclick="updateStatus('${o.orderId}', 'WAIT_PAYMENT')" class="bg-amber-500 text-white px-2 py-1 rounded text-[10px]">發送付款通知</button>
+                ` : ''}
+                ${o.status === 'WAIT_PAYMENT' ? `
+                  <button onclick="updateStatus('${o.orderId}', 'PAID')" class="bg-blue-600 text-white px-2 py-1 rounded text-[10px]">確認已收款</button>
+                ` : ''}
+                ${o.status === 'PAID' ? `
+                  <button onclick="shipOrder('${o.orderId}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px]">出貨(填追蹤碼)</button>
+                ` : ''}
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-rose-500">載入失敗</td></tr>';
+      }
+    }
+
+    // 農夫更新訂單狀態
+    async function updateStatus(orderId, newStatus, trackingCode = "") {
+      if(!confirm(`確定將訂單 ${orderId} 狀態變更為 ${newStatus}？`)) return;
+
+      const baseUrl = window.location.href.split('?')[0];
+      const payload = { action: "updateOrderStatus", orderId, newStatus, trackingCode, baseUrl };
+
+      await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify(payload) });
+      alert("狀態更新完成！");
+      loadAdminOrders();
+    }
+
+    function shipOrder(orderId) {
+      const code = prompt("請輸入黑貓/新竹物流追蹤碼：");
+      if (code) updateStatus(orderId, "SHIPPED", code);
+    }
+
+    // 開啟專屬付款頁
+    function openPayTab(orderId) {
+      switchTab('pay');
+      document.getElementById('payOrderIdDisplay').innerText = orderId;
+      document.getElementById('payItemsDisplay').innerText = "載入中...";
+      document.getElementById('payAmountDisplay').innerText = "";
+
+      // 查詢訂單細節
+      fetch(`${GAS_API_URL}?action=searchOrder&query=${orderId}`)
+        .then(r => r.json())
+        .then(d => {
+          if(d.orders && d.orders[0]) {
+            document.getElementById('payItemsDisplay').innerText = d.orders[0].items;
+            document.getElementById('payAmountDisplay').innerText = `NT$ ${d.orders[0].totalAmount}`;
+          }
+        });
+    }
+
+    // 買家提交付款資訊
+    async function handlePaySubmit(e) {
+      e.preventDefault();
+      const orderId = document.getElementById('payOrderIdDisplay').innerText;
+      const note = document.getElementById('payNote').value;
+
+      const payload = { action: "submitPayment", orderId, paymentNote: note };
+      await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify(payload) });
+
+      alert("已收到您的付款回報！農夫對帳無誤後將立即備貨寄出。");
+      switchTab('search');
+      document.getElementById('searchInput').value = orderId;
+      searchOrders();
+    }
+
+    // 狀態標籤渲染 helper
+    function getStatusBadge(status) {
+      const map = {
+        'RESERVED': '<span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-bold">預約登記中</span>',
+        'WAIT_PAYMENT': '<span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">等待採收付款</span>',
+        'PAID': '<span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded-full font-bold">已付款/包裝中</span>',
+        'SHIPPED': '<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">已配送出貨</span>'
+      };
+      return map[status] || status;
+    }
+  </script>
+</body>
+</html>
