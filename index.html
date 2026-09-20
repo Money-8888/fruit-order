@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阿咘奶粉錢 - 水果訂購與農夫後台</title>
+  <title>鮮果嚴選 - 水果訂購與農夫後台</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-emerald-50/50 min-h-screen font-sans text-slate-800">
@@ -159,7 +159,7 @@
                   <th class="p-3">訂購人資</th>
                   <th class="p-3">訂購品項</th>
                   <th class="p-3">總金額</th>
-                  <th class="p-3">狀態</th>
+                  <th class="p-3">訂單處理狀態</th>
                 </tr>
               </thead>
               <tbody id="admin-order-table-body" class="divide-y text-sm"></tbody>
@@ -173,8 +173,8 @@
   </main>
 
   <script>
-    // ⚠️ 關鍵設定：請把你的 GAS 部署網址貼在下方引號中
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzCf00dDzX1vTOKAVrf6mgi_b8BS6BOVWtSlIDT3yz7J9cXEL-4o5oYuphOGJpTSwsP/exec";
+    // ⚠️ 請務必將您的 GAS Web App 部署網址貼在下方引號中
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxQsDLOyagMbYOOw-uYBozoZXRRq5fmEutsZCn0Q3DjtNjq9Uf10PQ7zMsXETsy0UKf/exec";
 
     let fruitsData = [];
     let cart = {};
@@ -200,6 +200,7 @@
       }
     }
 
+    // 切換頁籤 (前台/後台)
     function switchTab(tab) {
       document.getElementById('tab-shop').classList.toggle('hidden', tab !== 'shop');
       document.getElementById('tab-admin').classList.toggle('hidden', tab !== 'admin');
@@ -216,6 +217,7 @@
       }
     }
 
+    // 載入水果清單
     async function loadFruits() {
       const res = await callGasApi("getFruits");
       if (res && res.status === "success") {
@@ -225,6 +227,7 @@
       }
     }
 
+    // 渲染前台水果卡片
     function renderShopFruits() {
       const container = document.getElementById('shop-fruit-list');
       const activeFruits = fruitsData.filter(f => f.status === 'ON');
@@ -260,6 +263,7 @@
       `).join('');
     }
 
+    // 更新購物車數量
     function updateCart(fruitId, delta) {
       const currentQty = cart[fruitId] || 0;
       const newQty = Math.max(0, currentQty + delta);
@@ -276,6 +280,7 @@
       renderCartSummary();
     }
 
+    // 渲染購物車小計
     function renderCartSummary() {
       const container = document.getElementById('cart-summary');
       let total = 0;
@@ -294,6 +299,7 @@
       container.innerHTML = itemsSummary.length === 0 ? "尚未選擇任何水果" : itemsSummary.join('<br>');
     }
 
+    // 顧客提交訂單
     async function submitOrder(e) {
       e.preventDefault();
       if (Object.keys(cart).length === 0) {
@@ -301,13 +307,22 @@
         return;
       }
 
+      // 將選購品項轉為易讀的中文格式 (例如: "黑金剛蓮霧 x 3斤, 牛奶芭樂 x 2斤")
+      let itemsSummaryArray = [];
+      Object.keys(cart).forEach(id => {
+        const fruit = fruitsData.find(f => f.id === id);
+        if (fruit) {
+          itemsSummaryArray.push(`${fruit.name} x ${cart[id]}斤`);
+        }
+      });
+
       const orderData = {
         name: document.getElementById('cust-name').value,
         phone: document.getElementById('cust-phone').value,
         email: document.getElementById('cust-email').value,
         address: document.getElementById('cust-address').value,
         note: document.getElementById('cust-note').value,
-        items: cart,
+        items: itemsSummaryArray.join(", "),
         totalAmount: Number(document.getElementById('cart-total').innerText)
       };
 
@@ -330,6 +345,7 @@
       }
     }
 
+    // 檢查管理員登入狀態
     function checkAuthStatus() {
       const isLoggedIn = sessionStorage.getItem("isFarmerLogin") === "true";
       document.getElementById('admin-login-box').classList.toggle('hidden', isLoggedIn);
@@ -339,6 +355,7 @@
       }
     }
 
+    // 管理員登入
     async function handleLogin(e) {
       e.preventDefault();
       const user = document.getElementById('login-user').value;
@@ -360,11 +377,13 @@
       }
     }
 
+    // 管理員登出
     function handleLogout() {
       sessionStorage.removeItem("isFarmerLogin");
       checkAuthStatus();
     }
 
+    // 後台子分頁切換
     function switchAdminSubTab(sub) {
       document.getElementById('subtab-fruits').classList.toggle('hidden', sub !== 'fruits');
       document.getElementById('subtab-orders').classList.toggle('hidden', sub !== 'orders');
@@ -373,6 +392,7 @@
       document.getElementById('subtab-btn-orders').className = sub === 'orders' ? "px-4 py-2 rounded-lg font-bold bg-emerald-100 text-emerald-800" : "px-4 py-2 rounded-lg font-bold text-slate-600 hover:bg-slate-100";
     }
 
+    // 渲染後台水果列表
     function renderAdminFruits() {
       const tbody = document.getElementById('admin-fruit-table-body');
       tbody.innerHTML = fruitsData.map((f, idx) => `
@@ -399,6 +419,7 @@
       `).join('');
     }
 
+    // 後台新增水果空行
     function addNewFruitRow() {
       fruitsData.push({
         id: "F" + (fruitsData.length + 1),
@@ -410,6 +431,7 @@
       renderAdminFruits();
     }
 
+    // 後台上傳水果圖片
     function uploadFruitImage(fileInput, idx) {
       const file = fileInput.files[0];
       if (!file) return;
@@ -430,6 +452,7 @@
       reader.readAsDataURL(file);
     }
 
+    // 後台儲存所有水果設定
     async function saveFruitsToBackend() {
       const res = await callGasApi("updateFruits", { fruits: fruitsData });
       if (res.status === "success") {
@@ -440,6 +463,7 @@
       }
     }
 
+    // 載入後台訂單紀錄
     async function loadAdminOrders() {
       const res = await callGasApi("getOrders");
       if (res && res.status === "success") {
@@ -447,6 +471,26 @@
       }
     }
 
+    // 自動解析舊的 JSON 格式 (例如 {"F1":3,"F2":2}) 為中文水果名稱
+    function formatOrderItems(itemsStr) {
+      try {
+        const parsed = JSON.parse(itemsStr);
+        if (typeof parsed === 'object' && parsed !== null) {
+          const parts = [];
+          for (let id in parsed) {
+            const f = fruitsData.find(x => x.id === id);
+            const name = f ? f.name : id;
+            parts.push(`${name} x ${parsed[id]}斤`);
+          }
+          return parts.join(', ');
+        }
+      } catch (e) {
+        // 若不是 JSON 格式，代表已經是中文文字，直接回傳
+      }
+      return itemsStr;
+    }
+
+    // 渲染後台訂單列表
     function renderAdminOrders(orders) {
       const tbody = document.getElementById('admin-order-table-body');
       if (orders.length === 0) {
@@ -464,11 +508,30 @@
             <div class="font-bold">${o.name} (${o.phone})</div>
             <div class="text-xs text-slate-500">${o.address}</div>
           </td>
-          <td class="p-3 text-xs bg-slate-50 rounded">${o.items}</td>
+          <td class="p-3 text-xs bg-slate-50 rounded">${formatOrderItems(o.items)}</td>
           <td class="p-3 font-bold text-emerald-600">$${o.totalAmount}</td>
-          <td class="p-3"><span class="px-2 py-1 text-xs rounded bg-amber-100 text-amber-800 font-bold">${o.status}</span></td>
+          <td class="p-3">
+            <select onchange="changeOrderStatus('${o.orderId}', this.value)" class="px-2 py-1 text-xs rounded border border-slate-300 bg-white font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="待處理" ${o.status === '待處理' ? 'selected' : ''}>待處理</option>
+              <option value="處理中" ${o.status === '處理中' ? 'selected' : ''}>處理中</option>
+              <option value="已出貨" ${o.status === '已出貨' ? 'selected' : ''}>已出貨</option>
+              <option value="已完成" ${o.status === '已完成' ? 'selected' : ''}>已完成</option>
+              <option value="已取消" ${o.status === '已取消' ? 'selected' : ''}>已取消</option>
+            </select>
+          </td>
         </tr>
       `).join('');
+    }
+
+    // 變更訂單狀態並同步至 Google 試算表
+    async function changeOrderStatus(orderId, newStatus) {
+      const res = await callGasApi("updateOrderStatus", { orderId: orderId, status: newStatus });
+      if (res.status === "success") {
+        alert("訂單 " + orderId + " 狀態已更新為：" + newStatus);
+      } else {
+        alert("更新狀態失敗：" + res.message);
+        loadAdminOrders();
+      }
     }
   </script>
 </body>
