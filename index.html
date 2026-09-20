@@ -3,545 +3,503 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阿咘果園 - 自選水果箱預約系統</title>
+  <title>鮮果嚴選 - 水果訂購與農夫後台</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased font-sans pb-10">
+<body class="bg-emerald-50/50 min-h-screen font-sans text-slate-800">
 
-  <!-- 頂部導航 -->
-  <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-40">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center space-x-2 cursor-pointer" onclick="switchTab('home')">
-        <i class="fa-solid fa-lemon text-amber-300 text-2xl"></i>
-        <span class="font-bold text-xl tracking-wide">阿咘果園</span>
+  <!-- 頂部導覽列 -->
+  <header class="bg-emerald-600 text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl">🍎</span>
+        <h1 class="text-xl font-bold tracking-wide">鮮果嚴選直銷網</h1>
       </div>
-      <nav class="flex space-x-3 text-sm">
-        <button onclick="switchTab('home')" class="hover:bg-emerald-800 px-3 py-1.5 rounded-lg transition">自由配水果箱</button>
-        <button onclick="switchTab('search')" class="hover:bg-emerald-800 px-3 py-1.5 rounded-lg transition">查詢訂單</button>
-        <button onclick="switchTab('admin')" class="bg-emerald-900 hover:bg-black px-3 py-1.5 rounded-lg transition text-emerald-200">農夫後台</button>
+      <nav class="flex space-x-2">
+        <button onclick="switchTab('shop')" id="nav-shop" class="px-4 py-2 rounded-lg font-medium bg-white text-emerald-700 shadow-sm transition">🛒 訂購專區</button>
+        <button onclick="switchTab('admin')" id="nav-admin" class="px-4 py-2 rounded-lg font-medium text-emerald-100 hover:bg-emerald-700 transition">👨‍🌾 農夫後台</button>
       </nav>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-4 py-6">
+  <main class="max-w-6xl mx-auto px-4 py-8">
 
-    <!-- 頁面一：自選水果箱預約 (HOME) -->
-    <section id="tab-home" class="space-y-6">
-      <div class="bg-gradient-to-r from-emerald-600 to-teal-800 text-white rounded-2xl p-6 md:p-8 shadow-lg">
-        <span class="bg-amber-400 text-slate-900 text-xs font-bold px-2.5 py-1 rounded-full uppercase">產地直銷客製化</span>
-        <h1 class="text-2xl md:text-3xl font-extrabold mt-3">當季新鮮採收 · 自選水果箱預約</h1>
-        <p class="mt-2 text-emerald-100 text-xs md:text-sm">想吃什麼自己搭！選擇您需要的品項與斤數，採收後依實際秤重與品質通知付款配送。</p>
+    <!-- ========================================== -->
+    <!-- 1. 顧客訂購頁面 (Customer Shop) -->
+    <!-- ========================================== -->
+    <section id="tab-shop" class="space-y-8">
+      <div class="text-center max-w-2xl mx-auto">
+        <h2 class="text-3xl font-extrabold text-emerald-900 mb-2">產地直送，新鮮看得見</h2>
+        <p class="text-slate-600">挑選您喜愛的水果，填妥配送資料後即可完成訂購！</p>
       </div>
 
-      <!-- 商品預約表單卡片 -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <h2 class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b flex items-center justify-between">
-          <span><i class="fa-solid fa-basket-shopping text-emerald-600 mr-2"></i>步驟 1：選擇品項與斤數</span>
-          <span class="text-xs font-normal text-slate-500">單位：台斤 (斤)</span>
-        </h2>
-        
-        <!-- 動態水果清單選單 -->
-        <div id="fruitSelectionList" class="space-y-3">
-          <p class="text-center text-slate-400 py-4">載入當季水果清單中...</p>
-        </div>
+      <!-- 水果商品展示區域 -->
+      <div id="shop-fruit-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="col-span-full text-center py-12 text-slate-400">正在載入最新水果清單...</div>
+      </div>
 
-        <!-- 買家資料填寫 -->
-        <h2 class="text-lg font-bold text-slate-900 mt-8 mb-4 pb-2 border-b">
-          <i class="fa-solid fa-user-pen text-emerald-600 mr-2"></i>步驟 2：填寫預約資料（免預付）
-        </h2>
+      <!-- 結帳與訂購表單 -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 max-w-2xl mx-auto border border-emerald-100">
+        <h3 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4 flex items-center">
+          <span class="mr-2">📝</span> 填寫訂購資料
+        </h3>
         
-        <form id="reservationForm" onsubmit="handleReserve(event)" class="space-y-3">
+        <form id="order-form" onsubmit="submitOrder(event)" class="space-y-4">
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">姓名 *</label>
-            <input type="text" id="custName" required placeholder="請輸入收件人姓名" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">行動電話 *</label>
-            <input type="tel" id="custPhone" required placeholder="0912345678" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">電子信箱 Email *</label>
-            <input type="email" id="custEmail" required placeholder="example@gmail.com" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">冷藏配送地址 *</label>
-            <input type="text" id="custAddress" required placeholder="請填寫完整配送地址" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-          </div>
-
-          <!-- 結算列 -->
-          <div class="pt-6 border-t mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div>
-              <p class="text-xs text-slate-500">預計水果總重：<span id="totalWeightDisplay" class="font-bold text-slate-800">0</span> 斤</p>
-              <p class="text-2xl font-extrabold text-emerald-700">NT$ <span id="totalPriceDisplay">0</span></p>
+            <label class="block text-sm font-medium text-slate-700 mb-1">已選購品項與金額</label>
+            <div id="cart-summary" class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-sm text-slate-600 min-h-[60px]">
+              尚未選擇任何水果
             </div>
-            <button type="submit" id="submitBtn" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg transition">
-              確認預約水果箱
-            </button>
+            <div class="text-right text-lg font-bold text-emerald-600 mt-2">
+              總金額：$<span id="cart-total">0</span> 元
+            </div>
           </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">姓名 *</label>
+              <input type="text" id="cust-name" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">電話 *</label>
+              <input type="tel" id="cust-phone" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+              <input type="email" id="cust-email" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">配送地址 *</label>
+              <input type="text" id="cust-address" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">備註說明</label>
+            <textarea id="cust-note" rows="2" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="例如：方便收貨時間..."></textarea>
+          </div>
+
+          <button type="submit" id="btn-submit-order" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-emerald-700 active:scale-[0.99] transition">
+            送出訂單
+          </button>
         </form>
       </div>
     </section>
 
-    <!-- 頁面二：查詢訂單 (SEARCH) -->
-    <section id="tab-search" class="hidden space-y-4">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border">
-        <h2 class="text-xl font-bold mb-3">訂單進度查詢</h2>
-        <div class="flex gap-2">
-          <input type="text" id="searchInput" placeholder="輸入手機號碼 或 訂單編號" class="flex-1 px-4 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-          <button onclick="searchOrders()" class="bg-emerald-600 text-white px-5 py-2 rounded-xl font-bold hover:bg-emerald-700">查詢</button>
-        </div>
-      </div>
-      <div id="searchResult" class="space-y-3"></div>
-    </section>
-
-    <!-- 頁面三：農夫管理後台 (ADMIN) -->
+    <!-- ========================================== -->
+    <!-- 2. 農夫後台管理頁面 (Farmer Admin) -->
+    <!-- ========================================== -->
     <section id="tab-admin" class="hidden space-y-6">
-      <div class="bg-slate-900 text-white p-4 rounded-2xl flex justify-between items-center">
-        <div>
-          <h2 class="text-lg font-bold">阿咘果園管理後台</h2>
-          <p class="text-xs text-slate-400">管理當季水果品項與訂單出貨進度</p>
+
+      <!-- 登入卡片 (未登入時顯示) -->
+      <div id="admin-login-box" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-slate-100 mt-12">
+        <div class="text-center mb-6">
+          <span class="text-4xl">🔐</span>
+          <h2 class="text-2xl font-bold text-slate-800 mt-2">農夫管理員登入</h2>
+          <p class="text-sm text-slate-500">請輸入密碼以存取商品與訂單資料</p>
         </div>
-        <button onclick="loadAdminData()" class="bg-emerald-600 text-xs px-3 py-2 rounded-lg hover:bg-emerald-500">重新整理全部</button>
+        <form onsubmit="handleLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">帳號</label>
+            <input type="text" id="login-user" value="farmer" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">密碼</label>
+            <input type="password" id="login-pass" placeholder="預設 888888" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+          <button type="submit" class="w-full bg-slate-800 text-white font-bold py-2.5 rounded-lg hover:bg-slate-900 transition">登入後台</button>
+        </form>
       </div>
 
-      <!-- 區塊 A：當季水果上架管理（帶自動壓縮上傳） -->
-      <div class="bg-white p-6 rounded-2xl shadow border">
-        <div class="flex justify-between items-center mb-4 pb-2 border-b">
-          <h3 class="font-bold text-slate-800 text-base"><i class="fa-solid fa-lemon text-amber-500 mr-2"></i>當季水果品項與照片管理</h3>
-          <button onclick="addFruitRow()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold">+ 新增品項</button>
-        </div>
-
-        <div class="space-y-4" id="adminFruitList"></div>
-
-        <div class="mt-6 pt-3 border-t text-right">
-          <button onclick="saveFruitsToBackend()" id="saveFruitsBtn" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow">
-            儲存品項設定
-          </button>
-        </div>
-      </div>
-
-      <!-- 區塊 B：預約訂單管理 -->
-      <div class="bg-white rounded-2xl shadow border overflow-hidden">
-        <div class="p-4 bg-slate-100 border-b font-bold text-sm text-slate-800">
-          <i class="fa-solid fa-list-check mr-2"></i>客戶預約訂單列表
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-slate-50 border-b">
-              <tr>
-                <th class="p-3">單號/時間</th>
-                <th class="p-3">客戶資訊</th>
-                <th class="p-3">自選水果細項 / 金額</th>
-                <th class="p-3">狀態</th>
-                <th class="p-3">操作</th>
-              </tr>
-            </thead>
-            <tbody id="adminOrderTable" class="divide-y">
-              <tr><td colspan="5" class="p-4 text-center text-slate-400">載入訂單中...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- 頁面四：專屬付款頁 (PAYMENT) -->
-    <section id="tab-pay" class="hidden space-y-4">
-      <div class="bg-white p-6 rounded-2xl shadow-lg border max-w-lg mx-auto">
-        <div class="text-center pb-4 border-b">
-          <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">採收完成通知</span>
-          <h2 class="text-2xl font-bold mt-2">水果訂單完成轉帳</h2>
-          <p class="text-xs text-slate-500 mt-1">單號：<span id="payOrderIdDisplay" class="font-mono"></span></p>
-        </div>
-        <div class="py-4 space-y-3 text-sm">
-          <div class="flex justify-between text-slate-600">
-            <span>訂購內容：</span>
-            <span id="payItemsDisplay" class="font-bold text-slate-900 text-right"></span>
+      <!-- 後台管理內容區 (登入後顯示) -->
+      <div id="admin-panel" class="hidden space-y-8">
+        
+        <!-- 管理面板選單 -->
+        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+          <div class="flex space-x-2">
+            <button onclick="switchAdminSubTab('fruits')" id="subtab-btn-fruits" class="px-4 py-2 rounded-lg font-bold bg-emerald-100 text-emerald-800">🍎 水果商品管理</button>
+            <button onclick="switchAdminSubTab('orders')" id="subtab-btn-orders" class="px-4 py-2 rounded-lg font-bold text-slate-600 hover:bg-slate-100">📋 訂單紀錄檢視</button>
           </div>
-          <div class="flex justify-between text-slate-600">
-            <span>應付總金額：</span>
-            <span id="payAmountDisplay" class="text-lg font-bold text-emerald-600"></span>
-          </div>
-          <div class="bg-slate-50 p-4 rounded-xl border mt-4 space-y-2">
-            <p class="font-bold text-slate-800 border-b pb-1">匯款銀行帳號 (ATM / 網銀)</p>
-            <p class="text-xs">銀行：(700) 中華郵政</p>
-            <p class="text-xs">帳號：<span class="font-mono text-emerald-700 font-bold">0001234-0987654</span></p>
-            <p class="text-xs">戶名：阿咘果園</p>
-          </div>
-          <form onsubmit="handlePaySubmit(event)" class="mt-4 space-y-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">轉帳帳號末五碼 / 備註：</label>
-              <input type="text" id="payNote" required placeholder="例如：末五碼 12345" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+          <button onclick="handleLogout()" class="text-sm text-red-500 hover:underline">登出系統</button>
+        </div>
+
+        <!-- 子頁面 1: 水果商品編輯 -->
+        <div id="subtab-fruits" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-slate-800">水果商品清單設定</h3>
+            <div class="space-x-2">
+              <button onclick="addNewFruitRow()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-bold">+ 新增水果品項</button>
+              <button onclick="saveFruitsToBackend()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold shadow-sm">儲存全部更新</button>
             </div>
-            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow">確認已完成轉帳</button>
-          </form>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b bg-slate-50 text-slate-600 text-sm">
+                  <th class="p-3">圖片</th>
+                  <th class="p-3">水果名稱</th>
+                  <th class="p-3">每斤單價 (元)</th>
+                  <th class="p-3">上架狀態</th>
+                  <th class="p-3">上傳/更換圖片</th>
+                </tr>
+              </thead>
+              <tbody id="admin-fruit-table-body" class="divide-y text-sm">
+                <!-- 動態繪製商品編輯行 -->
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        <!-- 子頁面 2: 訂單紀錄 -->
+        <div id="subtab-orders" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-slate-800">最新訂單列表</h3>
+            <button onclick="loadAdminOrders()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm">🔄 重新整理</button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b bg-slate-50 text-slate-600 text-sm">
+                  <th class="p-3">訂單編號/時間</th>
+                  <th class="p-3">訂購人資</th>
+                  <th class="p-3">訂購品項</th>
+                  <th class="p-3">總金額</th>
+                  <th class="p-3">狀態</th>
+                </tr>
+              </thead>
+              <tbody id="admin-order-table-body" class="divide-y text-sm">
+                <!-- 動態繪製訂單列表 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </section>
 
   </main>
 
   <script>
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx_dmlXtFYoI1fPbXQuqI1yRZrWwZUWbHHMs44olSHOcOpu1MoHZZG3Msjwv81ouiYV/exec";
+    // 全域變數
+    let fruitsData = [];
+    let cart = {}; // { fruitId: quantity }
 
-    let availableFruits = []; 
-    let selectedCart = {};    
+    // 初始化頁面
+    window.onload = function() {
+      loadFruits();
+      checkAuthStatus();
+    };
 
-    window.addEventListener("DOMContentLoaded", () => {
-      loadFruitsCatalog();
+    // 切換主頁籤 (訂購 / 後台)
+    function switchTab(tab) {
+      document.getElementById('tab-shop').classList.toggle('hidden', tab !== 'shop');
+      document.getElementById('tab-admin').classList.toggle('hidden', tab !== 'admin');
+      
+      const navShop = document.getElementById('nav-shop');
+      const navAdmin = document.getElementById('nav-admin');
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const orderId = urlParams.get("orderId");
-      const mode = urlParams.get("mode");
-
-      if (orderId && mode === "pay") openPayTab(orderId);
-      else if (orderId) {
-        switchTab('search');
-        document.getElementById('searchInput').value = orderId;
-        searchOrders();
-      }
-    });
-
-    function switchTab(tabName) {
-      ['home', 'search', 'admin', 'pay'].forEach(t => document.getElementById(`tab-${t}`).classList.add('hidden'));
-      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-      if (tabName === 'admin') loadAdminData();
-    }
-
-    async function loadFruitsCatalog() {
-      try {
-        const resp = await fetch(`${GAS_API_URL}?action=getFruits`);
-        const data = await resp.json();
-        if (data.fruits) {
-          availableFruits = data.fruits;
-          renderFruitSelection();
-          renderAdminFruitList();
-        }
-      } catch (e) {
-        document.getElementById('fruitSelectionList').innerHTML = '<p class="text-rose-500 text-center">載入水果清單失敗</p>';
+      if (tab === 'shop') {
+        navShop.className = "px-4 py-2 rounded-lg font-medium bg-white text-emerald-700 shadow-sm transition";
+        navAdmin.className = "px-4 py-2 rounded-lg font-medium text-emerald-100 hover:bg-emerald-700 transition";
+      } else {
+        navAdmin.className = "px-4 py-2 rounded-lg font-medium bg-white text-emerald-700 shadow-sm transition";
+        navShop.className = "px-4 py-2 rounded-lg font-medium text-emerald-100 hover:bg-emerald-700 transition";
       }
     }
 
-    function renderFruitSelection() {
-      const container = document.getElementById('fruitSelectionList');
-      const activeFruits = availableFruits.filter(f => f.status === 'ON');
+    // 取得水果清單
+    function loadFruits() {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res.status === "success") {
+            fruitsData = res.data;
+            renderShopFruits();
+            renderAdminFruits();
+          }
+        })
+        .getFruitsData();
+    }
+
+    // 渲染前台水果商品頁
+    function renderShopFruits() {
+      const container = document.getElementById('shop-fruit-list');
+      const activeFruits = fruitsData.filter(f => f.status === 'ON');
 
       if (activeFruits.length === 0) {
-        container.innerHTML = '<p class="text-slate-400 text-center py-4">目前暫無上架水果，請稍後再來。</p>';
+        container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400">目前尚無上架的水果項目</div>`;
         return;
       }
 
-      container.innerHTML = activeFruits.map(f => {
-        const qty = selectedCart[f.id] || 0;
-        const imgTag = f.imageUrl 
-          ? `<img src="${f.imageUrl}" class="w-16 h-16 object-cover rounded-lg border flex-shrink-0 bg-slate-100">`
-          : `<div class="w-16 h-16 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700 flex-shrink-0"><i class="fa-solid fa-lemon text-xl"></i></div>`;
-
-        return `
-          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200 gap-3">
-            <div class="flex items-center space-x-3">
-              ${imgTag}
-              <div>
-                <p class="font-bold text-slate-900">${f.name}</p>
-                <p class="text-xs text-emerald-700 font-semibold">NT$ ${f.price} / 台斤</p>
+      container.innerHTML = activeFruits.map(fruit => `
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
+          <div class="h-48 bg-slate-100 relative overflow-hidden">
+            ${fruit.imageUrl 
+              ? `<img src="${fruit.imageUrl}" class="w-full h-full object-cover">` 
+              : `<div class="w-full h-full flex items-center justify-center text-slate-300 text-4xl">🍎</div>`}
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div>
+              <h3 class="text-lg font-bold text-slate-800">${fruit.name}</h3>
+              <p class="text-emerald-600 font-extrabold text-xl mt-1">$${fruit.price} <span class="text-xs text-slate-400 font-normal">/ 斤</span></p>
+            </div>
+            
+            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
+              <span class="text-xs font-bold text-slate-500 pl-2">數量(斤)</span>
+              <div class="flex items-center space-x-2">
+                <button onclick="updateCart('${fruit.id}', -1)" class="w-8 h-8 rounded-lg bg-white border shadow-sm font-bold text-slate-600 hover:bg-slate-100">-</button>
+                <span id="qty-${fruit.id}" class="w-8 text-center font-bold">${cart[fruit.id] || 0}</span>
+                <button onclick="updateCart('${fruit.id}', 1)" class="w-8 h-8 rounded-lg bg-white border shadow-sm font-bold text-slate-600 hover:bg-slate-100">+</button>
               </div>
             </div>
-            <div class="flex items-center space-x-3">
-              <button type="button" onclick="adjustFruitQty('${f.id}', -1)" class="w-8 h-8 bg-white border border-slate-300 rounded-lg font-bold shadow-sm hover:bg-slate-100">-</button>
-              <span class="font-bold text-base w-6 text-center">${qty}</span>
-              <button type="button" onclick="adjustFruitQty('${f.id}', 1)" class="w-8 h-8 bg-emerald-600 text-white rounded-lg font-bold shadow-sm hover:bg-emerald-700">+</button>
-            </div>
           </div>
-        `;
-      }).join('');
-
-      calculateCartTotal();
+        </div>
+      `).join('');
     }
 
-    function adjustFruitQty(fruitId, delta) {
-      const current = selectedCart[fruitId] || 0;
-      const next = Math.max(0, current + delta);
-      if (next === 0) delete selectedCart[fruitId];
-      else selectedCart[fruitId] = next;
+    // 更新購物車數量
+    function updateCart(fruitId, delta) {
+      const currentQty = cart[fruitId] || 0;
+      const newQty = Math.max(0, currentQty + delta);
+      
+      if (newQty === 0) {
+        delete cart[fruitId];
+      } else {
+        cart[fruitId] = newQty;
+      }
 
-      renderFruitSelection();
+      const qtyElem = document.getElementById(`qty-${fruitId}`);
+      if (qtyElem) qtyElem.innerText = newQty;
+
+      renderCartSummary();
     }
 
-    function calculateCartTotal() {
-      let totalWeight = 0, totalPrice = 0;
-      Object.keys(selectedCart).forEach(id => {
-        const fruit = availableFruits.find(f => f.id === id);
+    // 渲染購物車結帳摘要
+    function renderCartSummary() {
+      const container = document.getElementById('cart-summary');
+      let total = 0;
+      let itemsSummary = [];
+
+      Object.keys(cart).forEach(id => {
+        const fruit = fruitsData.find(f => f.id === id);
         if (fruit) {
-          const qty = selectedCart[id];
-          totalWeight += qty;
-          totalPrice += qty * fruit.price;
+          const subtotal = fruit.price * cart[id];
+          total += subtotal;
+          itemsSummary.push(`${fruit.name} x ${cart[id]}斤 ($${subtotal})`);
         }
       });
-      document.getElementById('totalWeightDisplay').innerText = totalWeight;
-      document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString();
-    }
 
-    async function handleReserve(e) {
-      e.preventDefault();
-      const itemsSummary = Object.keys(selectedCart).map(id => {
-        const f = availableFruits.find(item => item.id === id);
-        return `${f.name} x ${selectedCart[id]}斤`;
-      }).join(', ');
+      document.getElementById('cart-total').innerText = total;
 
-      if (!itemsSummary) return alert("請至少選擇一項水果斤數！");
-
-      const totalAmount = parseInt(document.getElementById('totalPriceDisplay').innerText.replace(/,/g, ''));
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.innerText = "提交預約中...";
-
-      const payload = {
-        action: "createOrder",
-        name: document.getElementById('custName').value,
-        phone: document.getElementById('custPhone').value,
-        email: document.getElementById('custEmail').value,
-        address: document.getElementById('custAddress').value,
-        items: itemsSummary,
-        totalAmount: totalAmount
-      };
-
-      try {
-        const resp = await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify(payload) });
-        const res = await resp.json();
-        if (res.result === "success") {
-          alert(`🎉 水果箱預約成功！\n您的預約單號為：${res.orderId}\n採收後我們會透過 Email 通知您付款。`);
-          document.getElementById('reservationForm').reset();
-          selectedCart = {};
-          calculateCartTotal();
-          switchTab('search');
-          document.getElementById('searchInput').value = res.orderId;
-          searchOrders();
-        } else alert("預約失敗：" + res.message);
-      } catch (err) {
-        alert("連線失敗，請檢查網路或 API 設定。");
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "確認預約水果箱";
+      if (itemsSummary.length === 0) {
+        container.innerHTML = "尚未選擇任何水果";
+      } else {
+        container.innerHTML = itemsSummary.join('<br>');
       }
     }
 
-    // 農夫後台：渲染品項
-    function renderAdminFruitList() {
-      const container = document.getElementById('adminFruitList');
-      container.innerHTML = availableFruits.map((f, idx) => {
-        const previewSrc = f.imageBase64 || f.imageUrl || '';
-        const imgPreview = previewSrc 
-          ? `<img src="${previewSrc}" class="w-12 h-12 object-cover rounded-lg border">`
-          : `<div class="w-12 h-12 rounded-lg border bg-slate-100 flex items-center justify-center text-slate-400 text-xs">無圖</div>`;
+    // 提交訂單
+    function submitOrder(e) {
+      e.preventDefault();
 
-        return `
-          <div class="flex flex-col sm:flex-row items-center gap-3 bg-slate-50 p-3 rounded-xl border">
-            ${imgPreview}
-            <div class="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
-              <input type="text" value="${f.name}" id="name-${idx}" placeholder="水果名稱" class="px-2.5 py-1.5 border rounded-lg text-xs outline-none">
-              <input type="number" value="${f.price}" id="price-${idx}" placeholder="單價/斤" class="px-2.5 py-1.5 border rounded-lg text-xs outline-none">
-              <select id="status-${idx}" class="text-xs p-1.5 border rounded-lg bg-white">
-                <option value="ON" ${f.status === 'ON' ? 'selected' : ''}>上架中</option>
-                <option value="OFF" ${f.status === 'OFF' ? 'selected' : ''}>已下架</option>
-              </select>
-              <label class="cursor-pointer bg-white border hover:bg-slate-100 text-slate-700 text-xs px-2.5 py-1.5 rounded-lg text-center flex items-center justify-center font-bold">
-                📸 選照片
-                <input type="file" accept="image/*" class="hidden" onchange="handleImageCompressAndSelect(event, ${idx})">
-              </label>
-            </div>
-            <button onclick="removeFruitRow(${idx})" class="text-rose-500 hover:text-rose-700 px-2 text-xs self-end sm:self-center"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        `;
-      }).join('');
+      if (Object.keys(cart).length === 0) {
+        alert("請至少選擇一種水果！");
+        return;
+      }
+
+      const orderData = {
+        name: document.getElementById('cust-name').value,
+        phone: document.getElementById('cust-phone').value,
+        email: document.getElementById('cust-email').value,
+        address: document.getElementById('cust-address').value,
+        note: document.getElementById('cust-note').value,
+        items: cart,
+        totalAmount: Number(document.getElementById('cart-total').innerText)
+      };
+
+      const btn = document.getElementById('btn-submit-order');
+      btn.disabled = true;
+      btn.innerText = "提交中...";
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.disabled = false;
+          btn.innerText = "送出訂單";
+          if (res.status === "success") {
+            alert("🎉 " + res.message + "\n您的訂單編號為：" + res.orderId);
+            cart = {};
+            document.getElementById('order-form').reset();
+            renderShopFruits();
+            renderCartSummary();
+          } else {
+            alert("訂單提交失敗：" + res.message);
+          }
+        })
+        .createOrder(orderData);
     }
 
-    // 🌟 自動照片壓縮功能 (避免 Base64 過大)
-    function handleImageCompressAndSelect(event, idx) {
-      const file = event.target.files[0];
+    // ==========================================
+    // 農夫後台管理系統 JS 邏輯
+    // ==========================================
+
+    function checkAuthStatus() {
+      const isLoggedIn = sessionStorage.getItem("isFarmerLogin") === "true";
+      document.getElementById('admin-login-box').classList.toggle('hidden', isLoggedIn);
+      document.getElementById('admin-panel').classList.toggle('hidden', !isLoggedIn);
+      if (isLoggedIn) {
+        loadAdminOrders();
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('login-user').value;
+      const pass = document.getElementById('login-pass').value;
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res.status === "success") {
+            sessionStorage.setItem("isFarmerLogin", "true");
+            checkAuthStatus();
+          } else {
+            alert(res.message);
+          }
+        })
+        .doPost({ action: "login", username: user, password: pass });
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem("isFarmerLogin");
+      checkAuthStatus();
+    }
+
+    function switchAdminSubTab(sub) {
+      document.getElementById('subtab-fruits').classList.toggle('hidden', sub !== 'fruits');
+      document.getElementById('subtab-orders').classList.toggle('hidden', sub !== 'orders');
+
+      document.getElementById('subtab-btn-fruits').className = sub === 'fruits' ? "px-4 py-2 rounded-lg font-bold bg-emerald-100 text-emerald-800" : "px-4 py-2 rounded-lg font-bold text-slate-600 hover:bg-slate-100";
+      document.getElementById('subtab-btn-orders').className = sub === 'orders' ? "px-4 py-2 rounded-lg font-bold bg-emerald-100 text-emerald-800" : "px-4 py-2 rounded-lg font-bold text-slate-600 hover:bg-slate-100";
+    }
+
+    // 渲染後台商品編輯列表
+    function renderAdminFruits() {
+      const tbody = document.getElementById('admin-fruit-table-body');
+      tbody.innerHTML = fruitsData.map((f, idx) => `
+        <tr data-id="${f.id}">
+          <td class="p-3">
+            <img id="img-preview-${idx}" src="${f.imageUrl || ''}" class="w-12 h-12 object-cover rounded-lg bg-slate-100 border">
+          </td>
+          <td class="p-3">
+            <input type="text" value="${f.name}" onchange="fruitsData[${idx}].name=this.value" class="px-2 py-1 border rounded w-full">
+          </td>
+          <td class="p-3">
+            <input type="number" value="${f.price}" onchange="fruitsData[${idx}].price=Number(this.value)" class="px-2 py-1 border rounded w-24">
+          </td>
+          <td class="p-3">
+            <select onchange="fruitsData[${idx}].status=this.value" class="px-2 py-1 border rounded">
+              <option value="ON" ${f.status === 'ON' ? 'selected' : ''}>上架 (ON)</option>
+              <option value="OFF" ${f.status === 'OFF' ? 'selected' : ''}>下架 (OFF)</option>
+            </select>
+          </td>
+          <td class="p-3">
+            <input type="file" accept="image/*" onchange="uploadFruitImage(this, ${idx})" class="text-xs text-slate-500">
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // 新增一列空白水果
+    function addNewFruitRow() {
+      fruitsData.push({
+        id: "F" + (fruitsData.length + 1),
+        name: "新品水果",
+        price: 100,
+        status: "ON",
+        imageUrl: ""
+      });
+      renderAdminFruits();
+    }
+
+    // 圖片上傳至 Google Drive
+    function uploadFruitImage(fileInput, idx) {
+      const file = fileInput.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          let width = img.width, height = img.height;
-          const max_size = 800; // 限制最大邊長為 800px
-
-          if (width > height) {
-            if (width > max_size) { height *= max_size / width; width = max_size; }
-          } else {
-            if (height > max_size) { width *= max_size / height; height = max_size; }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-
-          // 壓縮為 JPG 格式，品質 0.7
-          availableFruits[idx].imageBase64 = canvas.toDataURL('image/jpeg', 0.7);
-          renderAdminFruitList();
-        };
-        img.src = e.target.result;
+        const base64Data = e.target.result;
+        
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (res.status === "success") {
+              fruitsData[idx].imageUrl = res.url;
+              document.getElementById(`img-preview-${idx}`).src = res.url;
+              alert("圖片上傳成功！請記得點擊「儲存全部更新」");
+            } else {
+              alert("圖片上傳失敗：" + res.message);
+            }
+          })
+          .uploadImageToDrive(base64Data, file.name);
       };
       reader.readAsDataURL(file);
     }
 
-    function addFruitRow() {
-      availableFruits.push({ id: 'F' + (availableFruits.length + 1), name: '', price: 100, status: 'ON', imageUrl: '' });
-      renderAdminFruitList();
-    }
-
-    function removeFruitRow(idx) {
-      availableFruits.splice(idx, 1);
-      renderAdminFruitList();
-    }
-
-    async function saveFruitsToBackend() {
-      const newList = availableFruits.map((f, i) => {
-        const nameEl = document.getElementById(`name-${i}`);
-        const priceEl = document.getElementById(`price-${i}`);
-        const statusEl = document.getElementById(`status-${i}`);
-        return {
-          name: nameEl ? nameEl.value.trim() : f.name,
-          price: priceEl ? Number(priceEl.value) : f.price,
-          status: statusEl ? statusEl.value : f.status,
-          imageUrl: f.imageUrl || '',
-          imageBase64: f.imageBase64 || ''
-        };
-      }).filter(item => item.name);
-
-      const btn = document.getElementById('saveFruitsBtn');
-      btn.innerText = "儲存中 (上傳照片中)...";
-      btn.disabled = true;
-
-      try {
-        const resp = await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify({ action: "updateFruits", fruits: newList }) });
-        const res = await resp.json();
-        if (res.result === "success") {
-          alert("水果品項與照片已成功儲存！");
-          loadFruitsCatalog();
-        } else {
-          alert("儲存失敗：" + res.message);
-        }
-      } catch (e) {
-        alert("儲存失敗，請確認 GAS 權限與連線。");
-      } finally {
-        btn.innerText = "儲存品項設定";
-        btn.disabled = false;
-      }
-    }
-
-    function loadAdminData() {
-      loadFruitsCatalog();
-      loadAdminOrders();
-    }
-
-    async function loadAdminOrders() {
-      const tbody = document.getElementById('adminOrderTable');
-      tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">載入中...</td></tr>';
-      try {
-        const resp = await fetch(`${GAS_API_URL}?action=getAllOrders`);
-        const data = await resp.json();
-        if (data.orders) {
-          tbody.innerHTML = data.orders.map(o => `
-            <tr class="hover:bg-slate-50">
-              <td class="p-3 font-mono"><div>${o.orderId}</div><div class="text-[10px] text-slate-400">${o.date}</div></td>
-              <td class="p-3"><div class="font-bold">${o.name} (${o.phone})</div><div class="text-[10px] text-slate-400">${o.address}</div></td>
-              <td class="p-3"><div class="font-bold text-slate-800">${o.items}</div><div class="font-extrabold text-emerald-700">NT$ ${o.totalAmount}</div></td>
-              <td class="p-3">${getStatusBadge(o.status)}</td>
-              <td class="p-3 space-y-1">
-                ${o.status === 'RESERVED' ? `<button onclick="updateStatus('${o.orderId}', 'WAIT_PAYMENT')" class="bg-amber-500 text-white px-2 py-1 rounded text-[10px]">發送付款通知</button>` : ''}
-                ${o.status === 'WAIT_PAYMENT' ? `<button onclick="updateStatus('${o.orderId}', 'PAID')" class="bg-blue-600 text-white px-2 py-1 rounded text-[10px]">確認已收款</button>` : ''}
-                ${o.status === 'PAID' ? `<button onclick="shipOrder('${o.orderId}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px]">出貨(填追蹤碼)</button>` : ''}
-              </td>
-            </tr>
-          `).join('');
-        }
-      } catch(e) {
-        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-rose-500">載入失敗</td></tr>';
-      }
-    }
-
-    async function updateStatus(orderId, newStatus, trackingCode = "") {
-      if(!confirm(`確定變更訂單 ${orderId} 狀態為 ${newStatus}？`)) return;
-      const baseUrl = window.location.href.split('?')[0];
-      await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify({ action: "updateOrderStatus", orderId, newStatus, trackingCode, baseUrl }) });
-      alert("更新成功！");
-      loadAdminOrders();
-    }
-
-    function shipOrder(orderId) {
-      const code = prompt("請輸入黑貓/物流追蹤碼：");
-      if (code) updateStatus(orderId, "SHIPPED", code);
-    }
-
-    async function searchOrders() {
-      const q = document.getElementById('searchInput').value.trim();
-      if (!q) return alert("請輸入手機號碼或訂單編號");
-      const resDiv = document.getElementById('searchResult');
-      resDiv.innerHTML = '<p class="text-center text-slate-400 py-4">查詢中...</p>';
-      try {
-        const resp = await fetch(`${GAS_API_URL}?action=searchOrder&query=${encodeURIComponent(q)}`);
-        const data = await resp.json();
-        if (data.orders && data.orders.length > 0) {
-          resDiv.innerHTML = data.orders.map(o => `
-            <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-2">
-              <div class="flex justify-between items-center border-b pb-2">
-                <span class="font-mono font-bold text-slate-800">${o.orderId}</span>
-                ${getStatusBadge(o.status)}
-              </div>
-              <div class="text-xs space-y-1 text-slate-600">
-                <p class="font-bold text-slate-900">水果箱內容：${o.items}</p>
-                <p>總預算：NT$ ${o.totalAmount}</p>
-                <p>訂購人：${o.name}</p>
-                ${o.trackingCode ? `<p class="text-emerald-600 font-bold">物流追蹤碼：${o.trackingCode}</p>` : ''}
-              </div>
-              ${o.status === 'WAIT_PAYMENT' ? `<button onclick="openPayTab('${o.orderId}')" class="w-full bg-amber-500 text-white font-bold py-2 rounded-xl text-xs mt-2">進入付款頁面</button>` : ''}
-            </div>
-          `).join('');
-        } else resDiv.innerHTML = '<p class="text-center text-slate-500 py-4">查無相關訂單</p>';
-      } catch (err) {
-        resDiv.innerHTML = '<p class="text-center text-rose-500 py-4">查詢發生錯誤</p>';
-      }
-    }
-
-    function openPayTab(orderId) {
-      switchTab('pay');
-      document.getElementById('payOrderIdDisplay').innerText = orderId;
-      document.getElementById('payItemsDisplay').innerText = "載入中...";
-      document.getElementById('payAmountDisplay').innerText = "";
-
-      fetch(`${GAS_API_URL}?action=searchOrder&query=${orderId}`)
-        .then(r => r.json())
-        .then(d => {
-          if(d.orders && d.orders[0]) {
-            document.getElementById('payItemsDisplay').innerText = d.orders[0].items;
-            document.getElementById('payAmountDisplay').innerText = `NT$ ${d.orders[0].totalAmount}`;
+    // 儲存全部水果商品資料
+    function saveFruitsToBackend() {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res.status === "success") {
+            alert(res.message);
+            loadFruits();
+          } else {
+            alert("儲存失敗：" + res.message);
           }
-        });
+        })
+        .updateFruits({ fruits: fruitsData });
     }
 
-    async function handlePaySubmit(e) {
-      e.preventDefault();
-      const orderId = document.getElementById('payOrderIdDisplay').innerText;
-      const note = document.getElementById('payNote').value;
-      await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify({ action: "submitPayment", orderId, paymentNote: note }) });
-      alert("已收到您的付款回報！");
-      switchTab('search');
-      document.getElementById('searchInput').value = orderId;
-      searchOrders();
+    // 載入後台訂單
+    function loadAdminOrders() {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res.status === "success") {
+            renderAdminOrders(res.data);
+          }
+        })
+        .getOrdersData();
     }
 
-    function getStatusBadge(status) {
-      const map = {
-        'RESERVED': '<span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-bold">預約登記中</span>',
-        'WAIT_PAYMENT': '<span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">等待採收付款</span>',
-        'PAID': '<span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded-full font-bold">已付款/包裝中</span>',
-        'SHIPPED': '<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">已配送出貨</span>'
-      };
-      return map[status] || status;
+    // 渲染後台訂單列表
+    function renderAdminOrders(orders) {
+      const tbody = document.getElementById('admin-order-table-body');
+      if (orders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">尚無訂單資料</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = orders.map(o => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-3">
+            <div class="font-bold text-emerald-700">${o.orderId}</div>
+            <div class="text-xs text-slate-400">${o.time}</div>
+          </td>
+          <td class="p-3">
+            <div class="font-bold">${o.name} (${o.phone})</div>
+            <div class="text-xs text-slate-500">${o.address}</div>
+          </td>
+          <td class="p-3 text-xs bg-slate-50 rounded">${o.items}</td>
+          <td class="p-3 font-bold text-emerald-600">$${o.totalAmount}</td>
+          <td class="p-3"><span class="px-2 py-1 text-xs rounded bg-amber-100 text-amber-800 font-bold">${o.status}</span></td>
+        </tr>
+      `).join('');
     }
   </script>
 </body>
