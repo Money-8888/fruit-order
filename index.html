@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>鮮果嚴選 - 水果訂購與農夫後台</title>
+  <title>阿咘奶粉錢 - 水果訂購與農夫後台</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-emerald-50/50 min-h-screen font-sans text-slate-800">
@@ -173,6 +173,9 @@
   </main>
 
   <script>
+    // ⚠️ 關鍵設定：請把你的 GAS 部署網址貼在下方引號中
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzCf00dDzX1vTOKAVrf6mgi_b8BS6BOVWtSlIDT3yz7J9cXEL-4o5oYuphOGJpTSwsP/exec";
+
     let fruitsData = [];
     let cart = {};
 
@@ -180,6 +183,22 @@
       loadFruits();
       checkAuthStatus();
     };
+
+    // 通用 API 通訊函式 (使用 text/plain 避免 CORS 阻擋)
+    async function callGasApi(action, extraData = {}) {
+      try {
+        const payload = JSON.stringify({ action: action, ...extraData });
+        const res = await fetch(GAS_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: payload
+        });
+        return await res.json();
+      } catch (err) {
+        console.error("API 呼叫失敗:", err);
+        return { status: "error", message: "網路通訊失敗: " + err.message };
+      }
+    }
 
     function switchTab(tab) {
       document.getElementById('tab-shop').classList.toggle('hidden', tab !== 'shop');
@@ -197,16 +216,13 @@
       }
     }
 
-    function loadFruits() {
-      google.script.run
-        .withSuccessHandler(function(res) {
-          if (res && res.status === "success") {
-            fruitsData = res.data;
-            renderShopFruits();
-            renderAdminFruits();
-          }
-        })
-        .getFruitsData();
+    async function loadFruits() {
+      const res = await callGasApi("getFruits");
+      if (res && res.status === "success") {
+        fruitsData = res.data;
+        renderShopFruits();
+        renderAdminFruits();
+      }
     }
 
     function renderShopFruits() {
@@ -278,7 +294,7 @@
       container.innerHTML = itemsSummary.length === 0 ? "尚未選擇任何水果" : itemsSummary.join('<br>');
     }
 
-    function submitOrder(e) {
+    async function submitOrder(e) {
       e.preventDefault();
       if (Object.keys(cart).length === 0) {
         alert("請至少選擇一種水果！");
@@ -299,26 +315,20 @@
       btn.disabled = true;
       btn.innerText = "提交中...";
 
-      google.script.run
-        .withSuccessHandler(function(res) {
-          btn.disabled = false;
-          btn.innerText = "送出訂單";
-          if (res.status === "success") {
-            alert("🎉 " + res.message + "\n您的訂單編號為：" + res.orderId);
-            cart = {};
-            document.getElementById('order-form').reset();
-            renderShopFruits();
-            renderCartSummary();
-          } else {
-            alert("訂單提交失敗：" + res.message);
-          }
-        })
-        .createOrder(orderData);
-    }
+      const res = await callGasApi("createOrder", orderData);
+      btn.disabled = false;
+      btn.innerText = "送出訂單";
 
-    // ==========================================
-    // 登入驗證修正
-    // ==========================================
+      if (res.status === "success") {
+        alert("🎉 " + res.message + "\n您的訂單編號為：" + res.orderId);
+        cart = {};
+        document.getElementById('order-form').reset();
+        renderShopFruits();
+        renderCartSummary();
+      } else {
+        alert("訂單提交失敗：" + res.message);
+      }
+    }
 
     function checkAuthStatus() {
       const isLoggedIn = sessionStorage.getItem("isFarmerLogin") === "true";
@@ -329,7 +339,7 @@
       }
     }
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
       const user = document.getElementById('login-user').value;
       const pass = document.getElementById('login-pass').value;
@@ -338,24 +348,16 @@
       btn.disabled = true;
       btn.innerText = "驗證中...";
 
-      // 💡 正確方式：直接呼叫後端 checkLogin 函式
-      google.script.run
-        .withSuccessHandler(function(res) {
-          btn.disabled = false;
-          btn.innerText = "登入後台";
-          if (res && res.status === "success") {
-            sessionStorage.setItem("isFarmerLogin", "true");
-            checkAuthStatus();
-          } else {
-            alert(res ? res.message : "帳號或密碼錯誤");
-          }
-        })
-        .withFailureHandler(function(err) {
-          btn.disabled = false;
-          btn.innerText = "登入後台";
-          alert("系統發生錯誤：" + err.message);
-        })
-        .checkLogin(user, pass);
+      const res = await callGasApi("checkLogin", { user: user, pass: pass });
+      btn.disabled = false;
+      btn.innerText = "登入後台";
+
+      if (res && res.status === "success") {
+        sessionStorage.setItem("isFarmerLogin", "true");
+        checkAuthStatus();
+      } else {
+        alert(res ? res.message : "帳號或密碼錯誤");
+      }
     }
 
     function handleLogout() {
@@ -413,45 +415,36 @@
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         const base64Data = e.target.result;
         
-        google.script.run
-          .withSuccessHandler(function(res) {
-            if (res.status === "success") {
-              fruitsData[idx].imageUrl = res.url;
-              document.getElementById(`img-preview-${idx}`).src = res.url;
-              alert("圖片上傳成功！請記得點擊「儲存全部更新」");
-            } else {
-              alert("圖片上傳失敗：" + res.message);
-            }
-          })
-          .uploadImageToDrive(base64Data, file.name);
+        const res = await callGasApi("uploadImage", { base64Data: base64Data, fileName: file.name });
+        if (res.status === "success") {
+          fruitsData[idx].imageUrl = res.url;
+          document.getElementById(`img-preview-${idx}`).src = res.url;
+          alert("圖片上傳成功！請記得點擊「儲存全部更新」");
+        } else {
+          alert("圖片上傳失敗：" + res.message);
+        }
       };
       reader.readAsDataURL(file);
     }
 
-    function saveFruitsToBackend() {
-      google.script.run
-        .withSuccessHandler(function(res) {
-          if (res.status === "success") {
-            alert(res.message);
-            loadFruits();
-          } else {
-            alert("儲存失敗：" + res.message);
-          }
-        })
-        .updateFruits({ fruits: fruitsData });
+    async function saveFruitsToBackend() {
+      const res = await callGasApi("updateFruits", { fruits: fruitsData });
+      if (res.status === "success") {
+        alert(res.message);
+        loadFruits();
+      } else {
+        alert("儲存失敗：" + res.message);
+      }
     }
 
-    function loadAdminOrders() {
-      google.script.run
-        .withSuccessHandler(function(res) {
-          if (res && res.status === "success") {
-            renderAdminOrders(res.data);
-          }
-        })
-        .getOrdersData();
+    async function loadAdminOrders() {
+      const res = await callGasApi("getOrders");
+      if (res && res.status === "success") {
+        renderAdminOrders(res.data);
+      }
     }
 
     function renderAdminOrders(orders) {
