@@ -13,12 +13,20 @@
     <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center space-x-2">
         <span class="text-2xl">👨‍🌾</span>
-        <h1 class="text-xl font-bold">阿咘奶粉錢管理後台</h1>
+        <h1 class="text-xl font-bold">鮮果嚴選 - 農夫管理後台</h1>
       </div>
-      <button id="btn-logout" onclick="handleLogout()" class="hidden text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg text-white font-bold transition">登出系統</button>
+      
+      <!-- 右側按鈕區 -->
+      <div class="flex items-center space-x-3">
+        <!-- 💡 連結到顧客前台 (預設開新分頁) -->
+        <a href="./index.html" target="_blank" class="text-xs bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded-lg text-white font-bold transition flex items-center space-x-1 shadow-sm">
+          <span>🛒</span>
+          <span>查看顧客前台</span>
+        </a>
+        <button id="btn-logout" onclick="handleLogout()" class="hidden text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg text-white font-bold transition">登出系統</button>
+      </div>
     </div>
   </header>
-
   <main class="max-w-6xl mx-auto px-4 py-8">
 
     <!-- 1. 登入區塊 -->
