@@ -4,11 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>鮮果嚴選 - 水果訂購與農夫後台</title>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-  </style>
 </head>
 <body class="bg-emerald-50/50 min-h-screen font-sans text-slate-800">
 
@@ -28,21 +24,17 @@
 
   <main class="max-w-6xl mx-auto px-4 py-8">
 
-    <!-- ========================================== -->
-    <!-- 1. 顧客訂購頁面 (Customer Shop) -->
-    <!-- ========================================== -->
+    <!-- 1. 顧客訂購頁面 -->
     <section id="tab-shop" class="space-y-8">
       <div class="text-center max-w-2xl mx-auto">
         <h2 class="text-3xl font-extrabold text-emerald-900 mb-2">產地直送，新鮮看得見</h2>
         <p class="text-slate-600">挑選您喜愛的水果，填妥配送資料後即可完成訂購！</p>
       </div>
 
-      <!-- 水果商品展示區域 -->
       <div id="shop-fruit-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-full text-center py-12 text-slate-400">正在載入最新水果清單...</div>
       </div>
 
-      <!-- 結帳與訂購表單 -->
       <div class="bg-white rounded-2xl shadow-lg p-6 max-w-2xl mx-auto border border-emerald-100">
         <h3 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4 flex items-center">
           <span class="mr-2">📝</span> 填寫訂購資料
@@ -93,12 +85,10 @@
       </div>
     </section>
 
-    <!-- ========================================== -->
-    <!-- 2. 農夫後台管理頁面 (Farmer Admin) -->
-    <!-- ========================================== -->
+    <!-- 2. 農夫後台管理頁面 -->
     <section id="tab-admin" class="hidden space-y-6">
 
-      <!-- 登入卡片 (未登入時顯示) -->
+      <!-- 登入視窗 -->
       <div id="admin-login-box" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-slate-100 mt-12">
         <div class="text-center mb-6">
           <span class="text-4xl">🔐</span>
@@ -114,14 +104,12 @@
             <label class="block text-sm font-medium text-slate-700 mb-1">密碼</label>
             <input type="password" id="login-pass" placeholder="預設 888888" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
           </div>
-          <button type="submit" class="w-full bg-slate-800 text-white font-bold py-2.5 rounded-lg hover:bg-slate-900 transition">登入後台</button>
+          <button type="submit" id="btn-login" class="w-full bg-slate-800 text-white font-bold py-2.5 rounded-lg hover:bg-slate-900 transition">登入後台</button>
         </form>
       </div>
 
-      <!-- 後台管理內容區 (登入後顯示) -->
+      <!-- 後台管理內容區 -->
       <div id="admin-panel" class="hidden space-y-8">
-        
-        <!-- 管理面板選單 -->
         <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <div class="flex space-x-2">
             <button onclick="switchAdminSubTab('fruits')" id="subtab-btn-fruits" class="px-4 py-2 rounded-lg font-bold bg-emerald-100 text-emerald-800">🍎 水果商品管理</button>
@@ -130,7 +118,7 @@
           <button onclick="handleLogout()" class="text-sm text-red-500 hover:underline">登出系統</button>
         </div>
 
-        <!-- 子頁面 1: 水果商品編輯 -->
+        <!-- 水果商品管理 -->
         <div id="subtab-fruits" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
           <div class="flex justify-between items-center">
             <h3 class="text-xl font-bold text-slate-800">水果商品清單設定</h3>
@@ -151,14 +139,12 @@
                   <th class="p-3">上傳/更換圖片</th>
                 </tr>
               </thead>
-              <tbody id="admin-fruit-table-body" class="divide-y text-sm">
-                <!-- 動態繪製商品編輯行 -->
-              </tbody>
+              <tbody id="admin-fruit-table-body" class="divide-y text-sm"></tbody>
             </table>
           </div>
         </div>
 
-        <!-- 子頁面 2: 訂單紀錄 -->
+        <!-- 訂單紀錄 -->
         <div id="subtab-orders" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
           <div class="flex justify-between items-center">
             <h3 class="text-xl font-bold text-slate-800">最新訂單列表</h3>
@@ -176,9 +162,7 @@
                   <th class="p-3">狀態</th>
                 </tr>
               </thead>
-              <tbody id="admin-order-table-body" class="divide-y text-sm">
-                <!-- 動態繪製訂單列表 -->
-              </tbody>
+              <tbody id="admin-order-table-body" class="divide-y text-sm"></tbody>
             </table>
           </div>
         </div>
@@ -189,17 +173,14 @@
   </main>
 
   <script>
-    // 全域變數
     let fruitsData = [];
-    let cart = {}; // { fruitId: quantity }
+    let cart = {};
 
-    // 初始化頁面
     window.onload = function() {
       loadFruits();
       checkAuthStatus();
     };
 
-    // 切換主頁籤 (訂購 / 後台)
     function switchTab(tab) {
       document.getElementById('tab-shop').classList.toggle('hidden', tab !== 'shop');
       document.getElementById('tab-admin').classList.toggle('hidden', tab !== 'admin');
@@ -216,11 +197,10 @@
       }
     }
 
-    // 取得水果清單
     function loadFruits() {
       google.script.run
         .withSuccessHandler(function(res) {
-          if (res.status === "success") {
+          if (res && res.status === "success") {
             fruitsData = res.data;
             renderShopFruits();
             renderAdminFruits();
@@ -229,7 +209,6 @@
         .getFruitsData();
     }
 
-    // 渲染前台水果商品頁
     function renderShopFruits() {
       const container = document.getElementById('shop-fruit-list');
       const activeFruits = fruitsData.filter(f => f.status === 'ON');
@@ -265,7 +244,6 @@
       `).join('');
     }
 
-    // 更新購物車數量
     function updateCart(fruitId, delta) {
       const currentQty = cart[fruitId] || 0;
       const newQty = Math.max(0, currentQty + delta);
@@ -282,7 +260,6 @@
       renderCartSummary();
     }
 
-    // 渲染購物車結帳摘要
     function renderCartSummary() {
       const container = document.getElementById('cart-summary');
       let total = 0;
@@ -298,18 +275,11 @@
       });
 
       document.getElementById('cart-total').innerText = total;
-
-      if (itemsSummary.length === 0) {
-        container.innerHTML = "尚未選擇任何水果";
-      } else {
-        container.innerHTML = itemsSummary.join('<br>');
-      }
+      container.innerHTML = itemsSummary.length === 0 ? "尚未選擇任何水果" : itemsSummary.join('<br>');
     }
 
-    // 提交訂單
     function submitOrder(e) {
       e.preventDefault();
-
       if (Object.keys(cart).length === 0) {
         alert("請至少選擇一種水果！");
         return;
@@ -347,7 +317,7 @@
     }
 
     // ==========================================
-    // 農夫後台管理系統 JS 邏輯
+    // 登入驗證修正
     // ==========================================
 
     function checkAuthStatus() {
@@ -363,17 +333,29 @@
       e.preventDefault();
       const user = document.getElementById('login-user').value;
       const pass = document.getElementById('login-pass').value;
+      const btn = document.getElementById('btn-login');
 
+      btn.disabled = true;
+      btn.innerText = "驗證中...";
+
+      // 💡 正確方式：直接呼叫後端 checkLogin 函式
       google.script.run
         .withSuccessHandler(function(res) {
-          if (res.status === "success") {
+          btn.disabled = false;
+          btn.innerText = "登入後台";
+          if (res && res.status === "success") {
             sessionStorage.setItem("isFarmerLogin", "true");
             checkAuthStatus();
           } else {
-            alert(res.message);
+            alert(res ? res.message : "帳號或密碼錯誤");
           }
         })
-        .doPost({ action: "login", username: user, password: pass });
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          btn.innerText = "登入後台";
+          alert("系統發生錯誤：" + err.message);
+        })
+        .checkLogin(user, pass);
     }
 
     function handleLogout() {
@@ -389,7 +371,6 @@
       document.getElementById('subtab-btn-orders').className = sub === 'orders' ? "px-4 py-2 rounded-lg font-bold bg-emerald-100 text-emerald-800" : "px-4 py-2 rounded-lg font-bold text-slate-600 hover:bg-slate-100";
     }
 
-    // 渲染後台商品編輯列表
     function renderAdminFruits() {
       const tbody = document.getElementById('admin-fruit-table-body');
       tbody.innerHTML = fruitsData.map((f, idx) => `
@@ -416,7 +397,6 @@
       `).join('');
     }
 
-    // 新增一列空白水果
     function addNewFruitRow() {
       fruitsData.push({
         id: "F" + (fruitsData.length + 1),
@@ -428,7 +408,6 @@
       renderAdminFruits();
     }
 
-    // 圖片上傳至 Google Drive
     function uploadFruitImage(fileInput, idx) {
       const file = fileInput.files[0];
       if (!file) return;
@@ -452,7 +431,6 @@
       reader.readAsDataURL(file);
     }
 
-    // 儲存全部水果商品資料
     function saveFruitsToBackend() {
       google.script.run
         .withSuccessHandler(function(res) {
@@ -466,18 +444,16 @@
         .updateFruits({ fruits: fruitsData });
     }
 
-    // 載入後台訂單
     function loadAdminOrders() {
       google.script.run
         .withSuccessHandler(function(res) {
-          if (res.status === "success") {
+          if (res && res.status === "success") {
             renderAdminOrders(res.data);
           }
         })
         .getOrdersData();
     }
 
-    // 渲染後台訂單列表
     function renderAdminOrders(orders) {
       const tbody = document.getElementById('admin-order-table-body');
       if (orders.length === 0) {
