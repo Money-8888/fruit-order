@@ -118,7 +118,7 @@
       }
     }
 
-    // 💡 渲染商品列表（含庫存數量與售完邏輯）
+   // 💡 渲染商品列表（含商品說明、庫存與 Edge 防阻擋圖片設定）
     function renderShopFruits() {
       const container = document.getElementById('shop-fruit-list');
       const activeFruits = fruitsData.filter(f => f.status === 'ON');
@@ -135,9 +135,10 @@
 
         return `
           <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition ${isSoldOut ? 'opacity-80' : ''}">
+            <!-- 商品圖片區塊 (含 Edge 瀏覽器防阻擋標籤) -->
             <div class="h-48 bg-slate-100 relative overflow-hidden">
               ${fruit.imageUrl 
-                ? `<img src="${fruit.imageUrl}" class="w-full h-full object-cover">` 
+                ? `<img src="${fruit.imageUrl}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` 
                 : `<div class="w-full h-full flex items-center justify-center text-slate-300 text-4xl">🍎</div>`}
               
               <!-- 💡 剩餘庫存標籤 -->
@@ -149,13 +150,21 @@
               </div>
             </div>
 
+            <!-- 商品文字與說明區塊 -->
             <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
               <div>
                 <h3 class="text-lg font-bold text-slate-800">${fruit.name}</h3>
-                <p class="text-emerald-600 font-extrabold text-xl mt-1">$${fruit.price} <span class="text-xs text-slate-400 font-normal">/ 斤</span></p>
+                
+                <!-- 💡 商品說明 (有填寫時才顯示，支援自動換行) -->
+                ${fruit.description 
+                  ? `<p class="text-xs text-slate-500 mt-1.5 leading-relaxed whitespace-pre-line bg-slate-50 p-2 rounded-lg border border-slate-100">${fruit.description}</p>` 
+                  : ''
+                }
+
+                <p class="text-emerald-600 font-extrabold text-xl mt-2">$${fruit.price} <span class="text-xs text-slate-400 font-normal">/ 斤</span></p>
               </div>
               
-              <!-- 💡 數量調整區 (售完時禁用) -->
+              <!-- 💡 數量調整按鈕 (售完時禁用) -->
               <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
                 <span class="text-xs font-bold text-slate-500 pl-2">數量(斤)</span>
                 <div class="flex items-center space-x-2">
