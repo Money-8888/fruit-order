@@ -136,11 +136,11 @@
         return `
           <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition ${isSoldOut ? 'opacity-80' : ''}">
             <!-- 商品圖片區塊 (含 Edge 瀏覽器防阻擋標籤) -->
-            <div class="h-48 bg-slate-100 relative overflow-hidden">
+            <div class="h-48 bg-slate-100 relative overflow-hidden flex items-center justify-center">
               ${fruit.imageUrl 
-                ? `<img src="${fruit.imageUrl}" referrerpolicy="no-referrer" class="w-full h-full object-cover">` 
+                ? `<img src="${fruit.imageUrl}" referrerpolicy="no-referrer" class="w-full h-full object-contain p-2">` 
                 : `<div class="w-full h-full flex items-center justify-center text-slate-300 text-4xl">🍎</div>`}
-              
+                
               <!-- 💡 剩餘庫存標籤 -->
               <div class="absolute top-3 right-3">
                 ${isSoldOut 
