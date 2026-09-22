@@ -205,6 +205,15 @@
               <label class="block text-xs font-bold text-slate-500 mb-1">剩餘庫存</label>
               <input type="number" value="${f.stock !== undefined ? f.stock : 0}" onchange="fruitsData[${idx}].stock=Number(this.value)" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 text-sm">
             </div>
+            <!-- 在 admin.html 的水果卡片內新增說明輸入框 -->
+            <div class="mt-2">
+              <label class="block text-xs font-bold text-slate-500 mb-1">商品說明 / 備註</label>
+              <textarea 
+                onchange="fruitsData[${idx}].description=this.value" 
+                rows="2" 
+                class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-xs text-slate-700 outline-none focus:border-emerald-500" 
+                placeholder="例如：甜度 15 度、口感酥脆、產地直送...">${f.description || ''}</textarea>
+            </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">上架狀態</label>
               <select onchange="fruitsData[${idx}].status=this.value" class="w-full px-1 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 bg-white text-sm">
@@ -229,7 +238,8 @@
         price: 100,
         stock: 50,
         status: "ON",
-        imageUrl: ""
+        imageUrl: "",
+        description: "" // 💡 新增預設空說明
       });
       renderAdminFruits();
     }
