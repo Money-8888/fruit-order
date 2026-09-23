@@ -43,7 +43,7 @@
       <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
         <span>📦</span> 本週當季水果
       </h3>
-      <span class="text-xs text-slate-400">點擊 ＋ 號加入購物車</span>
+      <span class="text-xs text-slate-400">點擊 ＋ 號加入購物車並開啟購物車</span>
     </div>
 
     <div id="shop-fruit-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -294,13 +294,13 @@
                 <p class="text-emerald-600 font-extrabold text-xl mt-2">$${fruit.price} <span class="text-xs text-slate-400 font-normal">/ 斤</span></p>
               </div>
             
-              <!-- 數量調整按鈕 -->
+              <!-- 數量調整與新增按鈕 (點擊加號傳入 openDrawer=true 參數) -->
               <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
                 <span class="text-xs font-bold text-slate-500 pl-2">數量(斤)</span>
                 <div class="flex items-center space-x-2">
                   <button onclick="updateCart('${fruit.id}', -1)" ${isSoldOut ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-white border shadow-sm font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed">-</button>
                   <span id="qty-${fruit.id}" class="w-8 text-center font-bold text-sm">${cart[fruit.id] || 0}</span>
-                  <button onclick="updateCart('${fruit.id}', 1)" ${isSoldOut ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-white border shadow-sm font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed">+</button>
+                  <button onclick="updateCart('${fruit.id}', 1, true)" ${isSoldOut ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-emerald-600 text-white shadow-sm font-bold hover:bg-emerald-700 active:scale-95 transition disabled:opacity-40 disabled:cursor-not-allowed" title="加入購物車">+</button>
                 </div>
               </div>
             </div>
@@ -327,7 +327,8 @@
     }
 
     // ------------------- 2. 購物車邏輯 -------------------
-    function updateCart(fruitId, delta) {
+    // 新增 openDrawer 參數：為 true 時在新增商品後自動跳出購物車側邊欄
+    function updateCart(fruitId, delta, openDrawer = false) {
       const fruit = fruitsData.find(f => f.id === fruitId);
       if (!fruit) return;
 
@@ -346,16 +347,21 @@
         cart[fruitId] = newQty;
       }
 
-      // 同步更新主頁面的數量數字
+      // 1. 同步更新主頁面的數量數字標籤
       const qtyElem = document.getElementById(`qty-${fruitId}`);
       if (qtyElem) qtyElem.innerText = cart[fruitId] || 0;
 
+      // 2. 渲染購物車 UI 畫面
       renderCartUI();
+
+      // 3. 若是在主頁面點擊新增（openDrawer = true 且 delta > 0），自動跳出購物車抽屜
+      if (openDrawer && delta > 0) {
+        toggleCartDrawer(true);
+      }
     }
 
-    // 💡 升級版：購物車抽屜項目新增加減按鈕
     function renderCartUI() {
-      // 1. 更新懸浮紅點數量
+      // 更新懸浮紅點數量
       const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
       const badge = document.getElementById('floating-cart-badge');
       if (totalItems > 0) {
@@ -365,7 +371,7 @@
         badge.classList.add('hidden');
       }
 
-      // 2. 渲染側邊欄清單
+      // 渲染側邊欄購物車明細
       const container = document.getElementById('cart-drawer-items');
       let totalAmount = 0;
       const cartKeys = Object.keys(cart);
@@ -404,7 +410,6 @@
 
             <!-- 右側：數量調整按鈕 (+ / -)、小計與刪除按鈕 -->
             <div class="flex items-center space-x-2 flex-shrink-0">
-              <!-- 購物車內的加減控制 -->
               <div class="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200">
                 <button onclick="updateCart('${id}', -1)" class="w-6 h-6 rounded bg-white font-bold text-xs text-slate-600 hover:bg-slate-200 shadow-sm flex items-center justify-center">-</button>
                 <span class="w-7 text-center font-bold text-xs text-slate-800">${qty}</span>
