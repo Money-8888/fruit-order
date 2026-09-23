@@ -11,8 +11,7 @@
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
-  <!-- 頂部導覽列 (手機響應式) -->
-  <!-- 頂部導覽列 (單一登出按鈕簡化版) -->
+  <!-- 頂部導覽列 -->
   <header class="bg-slate-800 text-white shadow-md sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
       <!-- 左側標題 -->
@@ -126,7 +125,6 @@
       const isLoggedIn = sessionStorage.getItem("isFarmerLogin") === "true";
       document.getElementById('admin-login-box').classList.toggle('hidden', isLoggedIn);
       document.getElementById('admin-panel').classList.toggle('hidden', !isLoggedIn);
-      // 💡 只控制單一登出按鈕
       document.getElementById('btn-logout').classList.toggle('hidden', !isLoggedIn);
       
       if (isLoggedIn) {
@@ -177,7 +175,21 @@
       }
     }
 
-    // 💡 渲染水果卡片 (手機友善 UI)
+    // 💡 輔助函式：渲染圖片縮圖區塊 (支援多圖縮圖)
+    function renderThumbnails(imageUrlStr) {
+      if (!imageUrlStr) {
+        return `<div class="w-16 h-16 rounded-xl bg-slate-200 border flex items-center justify-center text-slate-400 text-xs font-bold flex-shrink-0">無圖片</div>`;
+      }
+      const urls = imageUrlStr.split(/[\n,]+/).map(u => u.trim()).filter(u => u.length > 0);
+      if (urls.length === 0) {
+        return `<div class="w-16 h-16 rounded-xl bg-slate-200 border flex items-center justify-center text-slate-400 text-xs font-bold flex-shrink-0">無圖片</div>`;
+      }
+      return urls.map((url, i) => `
+        <img src="${url}" referrerpolicy="no-referrer" class="w-16 h-16 object-cover rounded-xl bg-slate-200 border flex-shrink-0 shadow-sm" title="第 ${i + 1} 張圖片">
+      `).join('');
+    }
+
+    // 💡 渲染水果卡片 (手機友善 UI + 多圖支援)
     function renderAdminFruits() {
       const container = document.getElementById('admin-fruit-container');
       if (fruitsData.length === 0) {
@@ -187,46 +199,63 @@
 
       container.innerHTML = fruitsData.map((f, idx) => `
         <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 relative shadow-sm" data-id="${f.id}">
-          <div class="flex items-center space-x-3">
-            <img id="img-preview-${idx}" src="${f.imageUrl || ''}" class="w-16 h-16 object-cover rounded-xl bg-slate-200 border flex-shrink-0">
-            <div class="flex-1 space-y-1">
-              <label class="block text-xs font-bold text-slate-500">水果名稱</label>
-              <input type="text" value="${f.name}" onchange="fruitsData[${idx}].name=this.value" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none text-base">
+          
+          <!-- 上半部：圖片預覽列 + 水果名稱 -->
+          <div class="space-y-2">
+            <div class="flex items-center gap-2 overflow-x-auto pb-1" id="img-preview-box-${idx}">
+              ${renderThumbnails(f.imageUrl)}
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">水果名稱</label>
+              <input type="text" value="${f.name || ''}" onchange="fruitsData[${idx}].name=this.value" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none text-base">
             </div>
           </div>
 
-          <!-- 改為 3 欄式：單價 / 庫存 / 狀態 -->
+          <!-- 3 欄式：單價 / 庫存 / 狀態 -->
           <div class="grid grid-cols-3 gap-2">
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">單價 (元)</label>
-              <input type="number" value="${f.price}" onchange="fruitsData[${idx}].price=Number(this.value)" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-emerald-600 text-sm">
+              <input type="number" value="${f.price}" onchange="fruitsData[${idx}].price=Number(this.value)" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-emerald-600 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">剩餘庫存</label>
-              <input type="number" value="${f.stock !== undefined ? f.stock : 0}" onchange="fruitsData[${idx}].stock=Number(this.value)" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 text-sm">
-            </div>
-            <!-- 在 admin.html 的水果卡片內新增說明輸入框 -->
-            <div class="mt-2">
-              <label class="block text-xs font-bold text-slate-500 mb-1">商品說明 / 備註</label>
-              <textarea 
-                onchange="fruitsData[${idx}].description=this.value" 
-                rows="2" 
-                class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-xs text-slate-700 outline-none focus:border-emerald-500" 
-                placeholder="例如：甜度 15 度、口感酥脆、產地直送...">${f.description || ''}</textarea>
+              <input type="number" value="${f.stock !== undefined ? f.stock : 0}" onchange="fruitsData[${idx}].stock=Number(this.value)" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">上架狀態</label>
-              <select onchange="fruitsData[${idx}].status=this.value" class="w-full px-1 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 bg-white text-sm">
+              <select onchange="fruitsData[${idx}].status=this.value" class="w-full px-1 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 bg-white text-sm outline-none focus:ring-2 focus:ring-emerald-500">
                 <option value="ON" ${f.status === 'ON' ? 'selected' : ''}>🟢 上架</option>
                 <option value="OFF" ${f.status === 'OFF' ? 'selected' : ''}>🔴 下架</option>
               </select>
             </div>
           </div>
 
+          <!-- 商品說明 / 備註 -->
           <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">更換圖片 (可直接拍照)</label>
-            <input type="file" accept="image/*" onchange="uploadFruitImage(this, ${idx})" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+            <label class="block text-xs font-bold text-slate-500 mb-1">商品說明 / 備註</label>
+            <textarea 
+              onchange="fruitsData[${idx}].description=this.value" 
+              rows="2" 
+              class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-xs text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500" 
+              placeholder="例如：甜度 15 度、口感酥脆、產地直送...">${f.description || ''}</textarea>
           </div>
+
+          <!-- 圖片網址列表 (可手動修改，逗號分隔) -->
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">圖片網址 (可有多張，用逗號隔開)</label>
+            <input type="text" value="${f.imageUrl || ''}" onchange="fruitsData[${idx}].imageUrl=this.value; renderAdminFruits();" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-xs text-slate-600 outline-none focus:ring-2 focus:ring-emerald-500" placeholder="https://... , https://...">
+          </div>
+
+          <!-- 批量上傳圖片 (支援一次選取多張) -->
+          <div class="bg-white p-2.5 rounded-xl border border-slate-200 space-y-1">
+            <div class="flex justify-between items-center">
+              <label class="block text-xs font-bold text-slate-600">批量上傳照片 (可按 Ctrl/Shift 多選)</label>
+              <span id="upload-status-${idx}" class="text-[11px] font-bold text-emerald-600"></span>
+            </div>
+            <input type="file" accept="image/*" multiple onchange="uploadFruitImage(this, ${idx})" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+          </div>
+
         </div>
       `).join('');
     }
@@ -239,38 +268,69 @@
         stock: 50,
         status: "ON",
         imageUrl: "",
-        description: "" // 💡 新增預設空說明
+        description: ""
       });
       renderAdminFruits();
     }
 
-    function uploadFruitImage(fileInput, idx) {
-      const file = fileInput.files[0];
-      if (!file) return;
+    // 💡 升級版：支援多檔案批次上傳至 Google Drive
+    async function uploadFruitImage(fileInput, idx) {
+      const files = Array.from(fileInput.files);
+      if (files.length === 0) return;
 
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        const base64Data = e.target.result;
-        
-        const res = await callGasApi("uploadImage", { base64Data: base64Data, fileName: file.name });
-        if (res.status === "success") {
-          fruitsData[idx].imageUrl = res.url;
-          document.getElementById(`img-preview-${idx}`).src = res.url;
-          alert("圖片上傳成功！請記得點擊「儲存更新」");
+      const statusEl = document.getElementById(`upload-status-${idx}`);
+      if (statusEl) statusEl.innerText = `⏳ 轉檔中 (共 ${files.length} 張)...`;
+
+      try {
+        // 1. 將選取的所有圖片並行轉為 Base64
+        const fileDataList = await Promise.all(files.map(file => {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              resolve({
+                name: file.name,
+                mimeType: file.type,
+                base64: reader.result.split(',')[1]
+              });
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        }));
+
+        if (statusEl) statusEl.innerText = `☁️ 上傳 Google Drive 中...`;
+
+        // 2. 優先呼叫多圖上傳 API (備用 single API)
+        const res = await callGasApi("uploadMultipleImages", { files: fileDataList });
+
+        if (res && res.status === "success" && res.urls) {
+          const newUrlsStr = res.urls.join(',');
+          const existingUrls = (fruitsData[idx].imageUrl || "").trim();
+
+          // 串接原本的網址與新網址
+          fruitsData[idx].imageUrl = existingUrls ? `${existingUrls},${newUrlsStr}` : newUrlsStr;
+
+          if (statusEl) statusEl.innerText = `✅ 成功上傳 ${files.length} 張照片！`;
+          fileInput.value = ""; // 清空檔案選擇器
+          renderAdminFruits(); // 重新渲染更新視圖與縮圖
         } else {
-          alert("圖片上傳失敗：" + res.message);
+          alert("圖片上傳失敗：" + (res.message || "未知錯誤"));
+          if (statusEl) statusEl.innerText = "❌ 上傳失敗";
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error(err);
+        alert("圖片轉檔或傳送時發生錯誤！");
+        if (statusEl) statusEl.innerText = "❌ 發生錯誤";
+      }
     }
 
     async function saveFruitsToBackend() {
       const res = await callGasApi("updateFruits", { fruits: fruitsData });
-      if (res.status === "success") {
-        alert(res.message);
+      if (res && res.status === "success") {
+        alert(res.message || "水果資料儲存成功！");
         loadFruits();
       } else {
-        alert("儲存失敗：" + res.message);
+        alert("儲存失敗：" + (res ? res.message : "未知錯誤"));
       }
     }
 
@@ -300,7 +360,7 @@
     // 💡 渲染訂單卡片 (手機友善 UI)
     function renderAdminOrders(orders) {
       const container = document.getElementById('admin-order-container');
-      if (orders.length === 0) {
+      if (!orders || orders.length === 0) {
         container.innerHTML = `<div class="text-center py-8 text-slate-400">尚無訂單資料</div>`;
         return;
       }
@@ -342,10 +402,10 @@
 
     async function changeOrderStatus(orderId, newStatus) {
       const res = await callGasApi("updateOrderStatus", { orderId: orderId, status: newStatus });
-      if (res.status === "success") {
+      if (res && res.status === "success") {
         alert("訂單 " + orderId + " 狀態已更新為：" + newStatus);
       } else {
-        alert("更新狀態失敗：" + res.message);
+        alert("更新狀態失敗：" + (res ? res.message : "未知錯誤"));
         loadAdminOrders();
       }
     }
