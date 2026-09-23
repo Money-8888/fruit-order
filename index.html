@@ -62,7 +62,6 @@
 
   <!-- 4. 側邊購物車抽屜 (無阻擋式，允許同時點擊主畫面) -->
   <div id="cart-drawer" class="fixed inset-y-0 right-0 z-50 hidden pointer-events-none flex justify-end">
-    
     <!-- 抽屜本體 -->
     <div class="w-[85vw] sm:w-96 bg-white shadow-2xl border-l border-emerald-100 h-full flex flex-col justify-between pointer-events-auto transform transition-transform duration-300">
       <!-- 頂部標題 -->
@@ -91,8 +90,8 @@
             <input type="text" id="order-name" required placeholder="收件人姓名" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
           </div>
           <div>
-            <label class="block text-slate-600 font-medium mb-1">電話 *</label>
-            <input type="tel" id="order-phone" required placeholder="連絡電話" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+            <label class="block text-slate-600 font-medium mb-1">連絡電話 *</label>
+            <input type="tel" id="order-phone" required placeholder="例如：0912345678" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
           </div>
           <div>
             <label class="block text-slate-600 font-medium mb-1">Email *</label>
@@ -115,16 +114,17 @@
     </div>
   </div>
 
-  <!-- 5. 會員中心 / 登入 / 註冊 彈窗 (Member Modal) -->
+  <!-- 5. 會員中心 / 登入 / 註冊 / 忘記密碼 彈窗 (Member Modal) -->
   <div id="member-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
     <div onclick="closeMemberModal()" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
     
     <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden z-10 my-8 flex flex-col max-h-[90vh]">
       <!-- 標題與 Tab 切換 -->
       <div class="bg-slate-50 p-4 border-b flex items-center justify-between">
-        <div id="member-modal-tabs" class="flex space-x-2">
-          <button id="tab-btn-login" onclick="switchMemberTab('login')" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white">會員登入</button>
-          <button id="tab-btn-register" onclick="switchMemberTab('register')" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600">免費註冊</button>
+        <div id="member-modal-tabs" class="flex space-x-1 sm:space-x-2">
+          <button id="tab-btn-login" onclick="switchMemberTab('login')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white">會員登入</button>
+          <button id="tab-btn-register" onclick="switchMemberTab('register')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600">免費註冊</button>
+          <button id="tab-btn-forgot" onclick="switchMemberTab('forgot')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600">忘記密碼</button>
         </div>
         <div id="member-modal-title-logged" class="hidden font-bold text-slate-800 text-base flex items-center gap-2">
           👤 會員中心
@@ -137,11 +137,14 @@
         <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
           <h3 class="font-bold text-slate-800 text-base">歡迎回來！請輸入登入資訊</h3>
           <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">手機號碼 (帳號)</label>
-            <input type="tel" id="login-phone" required class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="例如：0912345678">
+            <label class="block text-xs font-bold text-slate-500 mb-1">帳號</label>
+            <input type="text" id="login-account" required class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="請輸入自訂帳號或手機號碼">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">密碼</label>
+            <div class="flex justify-between items-center mb-1">
+              <label class="block text-xs font-bold text-slate-500">密碼</label>
+              <button type="button" onclick="switchMemberTab('forgot')" class="text-xs text-emerald-600 hover:text-emerald-700 hover:underline">忘記密碼？</button>
+            </div>
             <input type="password" id="login-password" required class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="請輸入密碼">
           </div>
           <button type="submit" id="btn-login-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition">登入會員</button>
@@ -151,16 +154,20 @@
         <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3 hidden">
           <h3 class="font-bold text-slate-800 text-base">加入會員</h3>
           <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">姓名 *</label>
-            <input type="text" id="reg-name" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="您的真實姓名">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">手機號碼 (做為帳號) *</label>
-            <input type="tel" id="reg-phone" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="0912345678">
+            <label class="block text-xs font-bold text-slate-500 mb-1">設定帳號 *</label>
+            <input type="text" id="reg-account" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="建議英文數字組合">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-500 mb-1">設定密碼 *</label>
-            <input type="password" id="reg-password" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="登入密碼">
+            <input type="password" id="reg-password" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="請輸入密碼">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">真實姓名 *</label>
+            <input type="text" id="reg-name" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="您的姓名">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">手機號碼 *</label>
+            <input type="tel" id="reg-phone" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="例如：0912345678">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-500 mb-1">Email *</label>
@@ -173,12 +180,36 @@
           <button type="submit" id="btn-register-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition mt-2">完成註冊</button>
         </form>
 
-        <!-- 區塊 C：登入後的個人中心、修改資料與歷史訂單 -->
+        <!-- 表單 C：忘記密碼 -->
+        <form id="form-forgot" onsubmit="handleForgotPassword(event)" class="space-y-3 hidden">
+          <h3 class="font-bold text-slate-800 text-base">忘記密碼查詢</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">請輸入您註冊時的帳號、手機號碼與 Email，三個欄位完全正確後即可顯示密碼。</p>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">帳號 *</label>
+            <input type="text" id="forgot-account" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="請輸入帳號">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">手機號碼 *</label>
+            <input type="tel" id="forgot-phone" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="例如：0912345678">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">Email *</label>
+            <input type="email" id="forgot-email" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="請輸入 Email">
+          </div>
+
+          <!-- 查詢結果顯示區域 -->
+          <div id="forgot-result" class="hidden bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl text-xs text-emerald-900 font-medium text-center space-y-1"></div>
+
+          <button type="submit" id="btn-forgot-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition mt-2">查詢密碼</button>
+        </form>
+
+        <!-- 區塊 D：登入後的個人中心、修改資料與歷史訂單 -->
         <div id="member-profile-view" class="hidden space-y-5">
           <div class="bg-emerald-50 p-4 rounded-2xl flex items-center justify-between border border-emerald-100">
             <div>
               <p id="profile-user-name" class="font-bold text-emerald-900 text-base">姓名</p>
-              <p id="profile-user-phone" class="text-xs text-emerald-700">電話</p>
+              <p id="profile-user-account" class="text-xs text-emerald-700">帳號</p>
+              <p id="profile-user-phone" class="text-xs text-emerald-600">手機</p>
             </div>
             <div class="flex items-center space-x-2">
               <button id="btn-toggle-edit-profile" onclick="toggleEditProfileView()" class="text-xs text-emerald-700 hover:bg-emerald-200 font-bold px-2.5 py-1 rounded-lg bg-emerald-100 transition">✏️ 修改資料</button>
@@ -201,8 +232,16 @@
           <form id="form-edit-profile" onsubmit="handleUpdateProfile(event)" class="hidden space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
             <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center gap-1">✏️ 修改個人會員資料</h4>
             <div>
+              <label class="block text-slate-400 font-medium mb-1">會員帳號 (不可修改)</label>
+              <input type="text" id="edit-account" disabled class="w-full px-3 py-2 border rounded-lg outline-none bg-slate-100 text-slate-500 font-bold">
+            </div>
+            <div>
               <label class="block text-slate-600 font-medium mb-1">真實姓名 *</label>
               <input type="text" id="edit-name" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">手機號碼 *</label>
+              <input type="tel" id="edit-phone" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
             </div>
             <div>
               <label class="block text-slate-600 font-medium mb-1">變更密碼 (若不修改請留空)</label>
@@ -308,8 +347,6 @@
         
         return `
           <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition ${isSoldOut ? 'opacity-80' : ''}">
-            
-            <!-- 1. 主圖片區塊 -->
             <div class="h-64 bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
               ${mainImgUrl 
                 ? `<img id="main-img-${fruit.id}" src="${mainImgUrl}" referrerpolicy="no-referrer" class="w-full h-full object-contain p-2 transition-all duration-300">` 
@@ -323,7 +360,6 @@
               </div>
             </div>
             
-            <!-- 2. 多張縮圖切換區塊 -->
             ${images.length > 1 ? `
               <div class="flex items-center gap-2 px-4 pt-3 overflow-x-auto">
                 ${images.map((img, idx) => `
@@ -335,20 +371,16 @@
               </div>
             ` : ''}
             
-            <!-- 3. 商品文字與說明區塊 -->
             <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
               <div>
                 <h3 class="text-lg font-bold text-slate-800">${fruit.name}</h3>
-                
                 ${fruit.description 
                   ? `<p class="text-xs text-slate-500 mt-1.5 leading-relaxed whitespace-pre-line bg-slate-50 p-2 rounded-lg border border-slate-100">${fruit.description}</p>` 
                   : ''
                 }
-                
                 <p class="text-emerald-600 font-extrabold text-xl mt-2">$${fruit.price} <span class="text-xs text-slate-400 font-normal">/ 斤</span></p>
               </div>
             
-              <!-- 數量調整與新增按鈕 -->
               <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
                 <span class="text-xs font-bold text-slate-500 pl-2">數量(斤)</span>
                 <div class="flex items-center space-x-2">
@@ -365,9 +397,7 @@
     
     function switchFruitImage(fruitId, targetImgUrl, clickedBtn) {
       const mainImg = document.getElementById(`main-img-${fruitId}`);
-      if (mainImg) {
-        mainImg.src = targetImgUrl;
-      }
+      if (mainImg) mainImg.src = targetImgUrl;
       
       const allThumbs = document.querySelectorAll(`.thumb-btn-${fruitId}`);
       allThumbs.forEach(btn => {
@@ -400,21 +430,17 @@
         cart[fruitId] = newQty;
       }
 
-      // 1. 同步更新主頁面卡片的數量數字標籤
       const qtyElem = document.getElementById(`qty-${fruitId}`);
       if (qtyElem) qtyElem.innerText = cart[fruitId] || 0;
 
-      // 2. 重新渲染購物車內容
       renderCartUI();
 
-      // 3. 點擊新增時自動展開購物車
       if (openDrawer && delta > 0) {
         toggleCartDrawer(true);
       }
     }
 
     function renderCartUI() {
-      // 更新懸浮紅點數字
       const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
       const badge = document.getElementById('floating-cart-badge');
       if (totalItems > 0) {
@@ -424,7 +450,6 @@
         badge.classList.add('hidden');
       }
 
-      // 渲染側邊欄購物車清單
       const container = document.getElementById('cart-drawer-items');
       let totalAmount = 0;
       const cartKeys = Object.keys(cart);
@@ -448,7 +473,6 @@
 
         return `
           <div class="py-3 flex items-center justify-between gap-2 border-b border-slate-100">
-            <!-- 左側：圖片與品名單價 -->
             <div class="flex items-center space-x-3 min-w-0 flex-1">
               <div class="w-12 h-12 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden flex items-center justify-center border border-slate-100">
                 ${cartImgUrl 
@@ -461,7 +485,6 @@
               </div>
             </div>
 
-            <!-- 右側：數量調整按鈕 (+ / -)、小計與刪除按鈕 -->
             <div class="flex items-center space-x-2 flex-shrink-0">
               <div class="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200">
                 <button onclick="updateCart('${id}', -1)" class="w-6 h-6 rounded bg-white font-bold text-xs text-slate-600 hover:bg-slate-200 shadow-sm flex items-center justify-center">-</button>
@@ -469,10 +492,7 @@
                 <button onclick="updateCart('${id}', 1)" class="w-6 h-6 rounded bg-white font-bold text-xs text-slate-600 hover:bg-slate-200 shadow-sm flex items-center justify-center">+</button>
               </div>
 
-              <!-- 小計金額 -->
               <span class="font-bold text-emerald-600 text-xs sm:text-sm w-12 text-right">$${subtotal}</span>
-
-              <!-- 刪除按鈕 -->
               <button onclick="updateCart('${id}', -${qty})" class="text-slate-300 hover:text-red-500 font-bold text-xs px-1" title="清除品項">✕</button>
             </div>
           </div>
@@ -482,7 +502,6 @@
       document.getElementById('cart-total-amount').innerText = totalAmount;
     }
 
-    // 切換購物車開關
     function toggleCartDrawer(explicitState = null) {
       const drawer = document.getElementById('cart-drawer');
       if (explicitState !== null) {
@@ -508,7 +527,7 @@
       const note = document.getElementById('order-note').value.trim();
 
       if (!name || !phone || !email || !address) {
-        alert("請完整填寫收件人姓名、電話、Email 與配送地址！");
+        alert("請完整填寫收件人姓名、連絡電話、Email 與配送地址！");
         return;
       }
 
@@ -531,7 +550,8 @@
         address: address,
         note: note,
         items: itemsSummaryArray.join(", "),
-        totalAmount: totalAmount
+        totalAmount: totalAmount,
+        account: currentUser ? currentUser.account : ''
       };
 
       const btn = document.getElementById('btn-submit-order');
@@ -589,14 +609,15 @@
       if (currentUser) {
         document.getElementById('form-login').classList.add('hidden');
         document.getElementById('form-register').classList.add('hidden');
+        document.getElementById('form-forgot').classList.add('hidden');
         document.getElementById('member-modal-tabs').classList.add('hidden');
         document.getElementById('member-modal-title-logged').classList.remove('hidden');
         
         document.getElementById('member-profile-view').classList.remove('hidden');
         document.getElementById('profile-user-name').innerText = currentUser.name;
-        document.getElementById('profile-user-phone').innerText = `📱 ${currentUser.phone}`;
+        document.getElementById('profile-user-account').innerText = `👤 帳號：${currentUser.account || '無'}`;
+        document.getElementById('profile-user-phone').innerText = `📱 手機：${currentUser.phone || '未提供'}`;
 
-        // 重置為歷史訂單檢視
         toggleEditProfileView(false);
         fetchMemberOrders();
       } else {
@@ -612,29 +633,48 @@
     }
 
     function switchMemberTab(tab) {
+      const formLogin = document.getElementById('form-login');
+      const formRegister = document.getElementById('form-register');
+      const formForgot = document.getElementById('form-forgot');
+      
+      const tabLogin = document.getElementById('tab-btn-login');
+      const tabRegister = document.getElementById('tab-btn-register');
+      const tabForgot = document.getElementById('tab-btn-forgot');
+
+      formLogin.classList.add('hidden');
+      formRegister.classList.add('hidden');
+      formForgot.classList.add('hidden');
+
+      tabLogin.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600";
+      tabRegister.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600";
+      tabForgot.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600";
+
+      // 清除忘記密碼結果區
+      const resultDiv = document.getElementById('forgot-result');
+      if (resultDiv) resultDiv.classList.add('hidden');
+
       if (tab === 'login') {
-        document.getElementById('form-login').classList.remove('hidden');
-        document.getElementById('form-register').classList.add('hidden');
-        document.getElementById('tab-btn-login').className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white";
-        document.getElementById('tab-btn-register').className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600";
-      } else {
-        document.getElementById('form-login').classList.add('hidden');
-        document.getElementById('form-register').classList.remove('hidden');
-        document.getElementById('tab-btn-login').className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600";
-        document.getElementById('tab-btn-register').className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white";
+        formLogin.classList.remove('hidden');
+        tabLogin.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white";
+      } else if (tab === 'register') {
+        formRegister.classList.remove('hidden');
+        tabRegister.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white";
+      } else if (tab === 'forgot') {
+        formForgot.classList.remove('hidden');
+        tabForgot.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white";
       }
     }
 
     async function handleLogin(e) {
       e.preventDefault();
-      const phone = document.getElementById('login-phone').value.trim();
+      const account = document.getElementById('login-account').value.trim();
       const pass = document.getElementById('login-password').value.trim();
 
       const btn = document.getElementById('btn-login-submit');
       btn.disabled = true;
       btn.innerText = "驗證中...";
 
-      const res = await callGasApi("login", { phone: phone, password: pass });
+      const res = await callGasApi("login", { account: account, password: pass });
 
       btn.disabled = false;
       btn.innerText = "登入會員";
@@ -647,20 +687,21 @@
         alert("登入成功！");
         openMemberModal();
       } else {
-        alert(res.message || "登入失敗，請驗證帳號密碼！");
+        alert(res.message || "登入失敗，請驗證帳號與密碼！");
       }
     }
 
     async function handleRegister(e) {
       e.preventDefault();
+      const account = document.getElementById('reg-account').value.trim();
+      const pass = document.getElementById('reg-password').value.trim();
       const name = document.getElementById('reg-name').value.trim();
       const phone = document.getElementById('reg-phone').value.trim();
-      const pass = document.getElementById('reg-password').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const address = document.getElementById('reg-address').value.trim();
 
-      if (!name || !phone || !pass || !email || !address) {
-        alert("請完整填寫所有註冊資料 (包含 Email 與預設配送地址)！");
+      if (!account || !pass || !name || !phone || !email || !address) {
+        alert("請完整填寫所有欄位！");
         return;
       }
 
@@ -669,9 +710,10 @@
       btn.innerText = "註冊資料提交中...";
 
       const res = await callGasApi("register", {
+        account: account,
+        password: pass,
         name: name,
         phone: phone,
-        password: pass,
         email: email,
         address: address
       });
@@ -682,9 +724,45 @@
       if (res && res.status === 'success') {
         alert("🎉 註冊成功！請直接登入");
         switchMemberTab('login');
-        document.getElementById('login-phone').value = phone;
+        document.getElementById('login-account').value = account;
       } else {
         alert(res.message || "註冊失敗！");
+      }
+    }
+
+    // ------------------- 5. 忘記密碼邏輯 -------------------
+    async function handleForgotPassword(e) {
+      e.preventDefault();
+      const account = document.getElementById('forgot-account').value.trim();
+      const phone = document.getElementById('forgot-phone').value.trim();
+      const email = document.getElementById('forgot-email').value.trim();
+
+      if (!account || !phone || !email) {
+        alert("請完整填寫帳號、手機號碼與 Email！");
+        return;
+      }
+
+      const btn = document.getElementById('btn-forgot-submit');
+      const resultDiv = document.getElementById('forgot-result');
+      
+      btn.disabled = true;
+      btn.innerText = "驗證中...";
+      resultDiv.classList.add('hidden');
+
+      const res = await callGasApi("forgotPassword", {
+        account: account,
+        phone: phone,
+        email: email
+      });
+
+      btn.disabled = false;
+      btn.innerText = "查詢密碼";
+
+      if (res && res.status === 'success') {
+        resultDiv.innerHTML = `🔐 驗證成功！您的密碼為：<div class="text-base text-emerald-900 font-extrabold underline tracking-wider mt-1">${res.password}</div>`;
+        resultDiv.classList.remove('hidden');
+      } else {
+        alert(res.message || "驗證失敗！請確認資料是否完全正確。");
       }
     }
 
@@ -702,7 +780,7 @@
       alert("已成功登出");
     }
 
-    // ------------------- 5. 會員資料修改功能 -------------------
+    // ------------------- 6. 會員資料修改功能 -------------------
     function toggleEditProfileView(show = null) {
       const ordersView = document.getElementById('subview-orders-list');
       const editForm = document.getElementById('form-edit-profile');
@@ -712,17 +790,17 @@
       const targetState = show !== null ? show : isHidden;
 
       if (targetState) {
-        // 顯示修改表單，預填資料
         ordersView.classList.add('hidden');
         editForm.classList.remove('hidden');
         toggleBtn.innerText = "📜 歷史訂單";
 
+        document.getElementById('edit-account').value = currentUser.account || '';
         document.getElementById('edit-name').value = currentUser.name || '';
+        document.getElementById('edit-phone').value = currentUser.phone || '';
         document.getElementById('edit-password').value = '';
         document.getElementById('edit-email').value = currentUser.email || '';
         document.getElementById('edit-address').value = currentUser.address || '';
       } else {
-        // 顯示歷史訂單
         ordersView.classList.remove('hidden');
         editForm.classList.add('hidden');
         toggleBtn.innerText = "✏️ 修改資料";
@@ -732,12 +810,13 @@
     async function handleUpdateProfile(e) {
       e.preventDefault();
       const newName = document.getElementById('edit-name').value.trim();
+      const newPhone = document.getElementById('edit-phone').value.trim();
       const newPass = document.getElementById('edit-password').value.trim();
       const newEmail = document.getElementById('edit-email').value.trim();
       const newAddress = document.getElementById('edit-address').value.trim();
 
-      if (!newName || !newEmail || !newAddress) {
-        alert("姓名、Email 與預設地址不可為空！");
+      if (!newName || !newPhone || !newEmail || !newAddress) {
+        alert("姓名、手機號碼、Email 與預設地址不可為空！");
         return;
       }
 
@@ -746,9 +825,10 @@
       btn.innerText = "儲存中...";
 
       const payload = {
-        phone: currentUser.phone,
+        account: currentUser.account,
         name: newName,
-        password: newPass, // 若為空，後端不修改密碼
+        phone: newPhone,
+        password: newPass,
         email: newEmail,
         address: newAddress
       };
@@ -760,14 +840,14 @@
 
       if (res && res.status === 'success') {
         alert("✨ 個人資料修改成功！");
-        // 更新本地 currentUser 物件
         currentUser.name = newName;
+        currentUser.phone = newPhone;
         currentUser.email = newEmail;
         currentUser.address = newAddress;
         localStorage.setItem('ab_fruit_user', JSON.stringify(currentUser));
 
-        // 更新頁面 UI 狀態
         document.getElementById('profile-user-name').innerText = currentUser.name;
+        document.getElementById('profile-user-phone').innerText = `📱 手機：${currentUser.phone}`;
         updateUserNavUI();
         autoFillCheckoutForm();
         toggleEditProfileView(false);
@@ -776,12 +856,15 @@
       }
     }
 
-    // ------------------- 6. 歷史訂單與詳細資料查詢 -------------------
+    // ------------------- 7. 歷史訂單與詳細資料查詢 -------------------
     async function fetchMemberOrders() {
       const container = document.getElementById('member-orders-list');
       container.innerHTML = `<div class="text-xs text-slate-400 text-center py-6">正在載入個人訂單...</div>`;
 
-      const res = await callGasApi("getMemberOrders", { phone: currentUser.phone });
+      const res = await callGasApi("getMemberOrders", { 
+        account: currentUser.account,
+        phone: currentUser.phone 
+      });
 
       if (res && res.status === 'success') {
         memberOrdersCache = res.data || [];
