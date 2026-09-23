@@ -236,36 +236,58 @@
       }
     }
 
+// 💡 升級版：支援「多張圖片」展示與縮圖點擊切換
     function renderShopFruits() {
       const container = document.getElementById('shop-fruit-list');
       const activeFruits = fruitsData.filter(f => f.status === 'ON');
-
+    
       if (activeFruits.length === 0) {
         container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">目前尚無上架的水果項目</div>`;
         return;
       }
-
+    
       container.innerHTML = activeFruits.map(fruit => {
         const stock = fruit.stock !== undefined ? Number(fruit.stock) : 0;
         const isSoldOut = stock <= 0;
-
+    
+        // 拆解圖片網址 (支援用逗號或換行隔開多張網址)
+        let rawUrls = fruit.imageUrl || "";
+        let images = rawUrls.split(/[\n,]+/).map(url => url.trim()).filter(url => url.length > 0);
+        
+        // 預設展示第一張圖
+        const mainImgUrl = images.length > 0 ? images[0] : "";
+    
         return `
           <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition ${isSoldOut ? 'opacity-80' : ''}">
-            <!-- 圖片區塊 (含 Edge 相容防阻擋) -->
-            <div class="h-56 bg-slate-100 relative overflow-hidden flex items-center justify-center">
-              ${fruit.imageUrl 
-                ? `<img src="${fruit.imageUrl}" referrerpolicy="no-referrer" class="w-full h-full object-contain p-2">` 
+            
+            <!-- 1. 主圖片區塊 -->
+            <div class="h-64 bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
+              ${mainImgUrl 
+                ? `<img id="main-img-${fruit.id}" src="${mainImgUrl}" referrerpolicy="no-referrer" class="w-full h-full object-contain p-2 transition-all duration-300">` 
                 : `<div class="w-full h-full flex items-center justify-center text-slate-300 text-4xl">🍎</div>`}
               
-              <div class="absolute top-3 right-3">
+              <!-- 剩餘庫存標籤 -->
+              <div class="absolute top-3 right-3 z-10">
                 ${isSoldOut 
                   ? `<span class="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">已售完</span>`
                   : `<span class="bg-emerald-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">剩餘 ${stock} 斤</span>`
                 }
               </div>
             </div>
-
-            <!-- 文字說明區塊 -->
+    
+            <!-- 2. 多張縮圖切換區塊 (只有當圖片超過 1 張時才顯示) -->
+            ${images.length > 1 ? `
+              <div class="flex items-center gap-2 px-4 pt-3 overflow-x-auto">
+                ${images.map((img, idx) => `
+                  <button onclick="switchFruitImage('${fruit.id}', '${img}', this)" 
+                          class="thumb-btn-${fruit.id} w-10 h-10 rounded-lg border-2 ${idx === 0 ? 'border-emerald-500' : 'border-transparent'} overflow-hidden flex-shrink-0 bg-slate-50 hover:opacity-80 transition">
+                    <img src="${img}" referrerpolicy="no-referrer" class="w-full h-full object-cover">
+                  </button>
+                `).join('')}
+              </div>
+            ` : ''}
+    
+            <!-- 3. 商品文字與說明區塊 -->
             <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
               <div>
                 <h3 class="text-lg font-bold text-slate-800">${fruit.name}</h3>
@@ -274,11 +296,11 @@
                   ? `<p class="text-xs text-slate-500 mt-1.5 leading-relaxed whitespace-pre-line bg-slate-50 p-2 rounded-lg border border-slate-100">${fruit.description}</p>` 
                   : ''
                 }
-
+    
                 <p class="text-emerald-600 font-extrabold text-xl mt-2">$${fruit.price} <span class="text-xs text-slate-400 font-normal">/ 斤</span></p>
               </div>
-
-              <!-- 加減數量按鈕 -->
+    
+              <!-- 數量調整按鈕 -->
               <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
                 <span class="text-xs font-bold text-slate-500 pl-2">數量(斤)</span>
                 <div class="flex items-center space-x-2">
@@ -292,7 +314,26 @@
         `;
       }).join('');
     }
-
+    
+    // 💡 新增：點擊縮圖切換主圖的控制函式
+    function switchFruitImage(fruitId, targetImgUrl, clickedBtn) {
+      // 切換大圖 URL
+      const mainImg = document.getElementById(`main-img-${fruitId}`);
+      if (mainImg) {
+        mainImg.src = targetImgUrl;
+      }
+    
+      // 更新小圖外框高亮顏色
+      const allThumbs = document.querySelectorAll(`.thumb-btn-${fruitId}`);
+      allThumbs.forEach(btn => {
+        btn.classList.remove('border-emerald-500');
+        btn.classList.add('border-transparent');
+      });
+      if (clickedBtn) {
+        clickedBtn.classList.remove('border-transparent');
+        clickedBtn.classList.add('border-emerald-500');
+      }
+    }
     // ------------------- 2. 購物車邏輯 -------------------
     function updateCart(fruitId, delta) {
       const fruit = fruitsData.find(f => f.id === fruitId);
