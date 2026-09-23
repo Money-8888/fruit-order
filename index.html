@@ -43,7 +43,7 @@
       <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
         <span>📦</span> 本週當季水果
       </h3>
-      <span class="text-xs text-slate-400">點擊 ＋ 號加入購物車並開啟購物車</span>
+      <span class="text-xs text-slate-400">點擊 ＋ 號即可同步新增至購物車</span>
     </div>
 
     <div id="shop-fruit-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -53,24 +53,22 @@
 
   <!-- 3. 右下角懸浮購物車按鈕 (Floating Cart Button) -->
   <div class="fixed bottom-6 right-6 z-40">
-    <button onclick="toggleCartDrawer(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition hover:scale-105 active:scale-95 relative">
+    <button onclick="toggleCartDrawer()" class="bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition hover:scale-105 active:scale-95 relative">
       <span class="text-2xl">🛒</span>
       <!-- 購物車數量 Badge -->
       <span id="floating-cart-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs font-black rounded-full h-6 w-6 flex items-center justify-center border-2 border-white shadow">0</span>
     </button>
   </div>
 
-  <!-- 4. 側邊購物車抽屜 (Cart Drawer Modal) -->
-  <div id="cart-drawer" class="fixed inset-0 z-50 hidden">
-    <!-- 背景遮罩 -->
-    <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"></div>
+  <!-- 4. 側邊購物車抽屜 (無阻擋式，允許同時點擊主畫面) -->
+  <div id="cart-drawer" class="fixed inset-y-0 right-0 z-50 hidden pointer-events-none flex justify-end">
     
-    <!-- 抽屜內容 -->
-    <div class="absolute inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl flex flex-col justify-between transform transition-transform duration-300">
+    <!-- 抽屜本體（開啟 pointer-events-auto 確保購物車內點擊正常） -->
+    <div class="w-[85vw] sm:w-96 bg-white shadow-2xl border-l border-emerald-100 h-full flex flex-col justify-between pointer-events-auto transform transition-transform duration-300">
       <!-- 頂部標題 -->
       <div class="p-4 border-b flex items-center justify-between bg-emerald-50">
         <h3 class="font-bold text-emerald-900 text-lg flex items-center gap-2">🛒 我的購物車</h3>
-        <button onclick="toggleCartDrawer(false)" class="text-slate-400 hover:text-slate-600 font-bold text-xl px-2">✕</button>
+        <button onclick="toggleCartDrawer(false)" class="text-slate-400 hover:text-slate-600 font-bold text-xl px-2" title="關閉購物車面板">✕</button>
       </div>
 
       <!-- 中間商品明細 -->
@@ -79,7 +77,7 @@
       </div>
 
       <!-- 底部金額與結帳資料表單 -->
-      <div class="p-5 border-t bg-slate-50 space-y-4 max-h-[60vh] overflow-y-auto">
+      <div class="p-5 border-t bg-slate-50 space-y-4 max-h-[55vh] overflow-y-auto">
         <div class="flex justify-between items-center text-slate-700 border-b pb-3">
           <span class="font-bold">總金額：</span>
           <span class="text-2xl font-black text-emerald-600">$<span id="cart-total-amount">0</span> 元</span>
@@ -294,7 +292,7 @@
                 <p class="text-emerald-600 font-extrabold text-xl mt-2">$${fruit.price} <span class="text-xs text-slate-400 font-normal">/ 斤</span></p>
               </div>
             
-              <!-- 數量調整與新增按鈕 (點擊加號傳入 openDrawer=true 參數) -->
+              <!-- 數量調整與新增按鈕 -->
               <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
                 <span class="text-xs font-bold text-slate-500 pl-2">數量(斤)</span>
                 <div class="flex items-center space-x-2">
@@ -327,7 +325,6 @@
     }
 
     // ------------------- 2. 購物車邏輯 -------------------
-    // 新增 openDrawer 參數：為 true 時在新增商品後自動跳出購物車側邊欄
     function updateCart(fruitId, delta, openDrawer = false) {
       const fruit = fruitsData.find(f => f.id === fruitId);
       if (!fruit) return;
@@ -347,21 +344,21 @@
         cart[fruitId] = newQty;
       }
 
-      // 1. 同步更新主頁面的數量數字標籤
+      // 1. 同步更新主頁面卡片的數量數字標籤
       const qtyElem = document.getElementById(`qty-${fruitId}`);
       if (qtyElem) qtyElem.innerText = cart[fruitId] || 0;
 
-      // 2. 渲染購物車 UI 畫面
+      // 2. 重新渲染購物車內容
       renderCartUI();
 
-      // 3. 若是在主頁面點擊新增（openDrawer = true 且 delta > 0），自動跳出購物車抽屜
+      // 3. 點擊新增時自動展開購物車（如果原本沒打開的話）
       if (openDrawer && delta > 0) {
         toggleCartDrawer(true);
       }
     }
 
     function renderCartUI() {
-      // 更新懸浮紅點數量
+      // 更新懸浮紅點數字
       const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
       const badge = document.getElementById('floating-cart-badge');
       if (totalItems > 0) {
@@ -371,7 +368,7 @@
         badge.classList.add('hidden');
       }
 
-      // 渲染側邊欄購物車明細
+      // 渲染側邊欄購物車清單
       const container = document.getElementById('cart-drawer-items');
       let totalAmount = 0;
       const cartKeys = Object.keys(cart);
@@ -429,10 +426,15 @@
       document.getElementById('cart-total-amount').innerText = totalAmount;
     }
 
-    function toggleCartDrawer(show) {
+    // 切換購物車開關
+    function toggleCartDrawer(explicitState = null) {
       const drawer = document.getElementById('cart-drawer');
-      if (show) drawer.classList.remove('hidden');
-      else drawer.classList.add('hidden');
+      if (explicitState !== null) {
+        if (explicitState) drawer.classList.remove('hidden');
+        else drawer.classList.add('hidden');
+      } else {
+        drawer.classList.toggle('hidden');
+      }
     }
 
     // ------------------- 3. 送出訂單 -------------------
