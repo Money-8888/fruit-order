@@ -176,7 +176,7 @@
       }
     }
 
-    // 💡 支援【拖曳排序】與【單圖一鍵刪除】的圖片微縮圖區塊
+    // 💡 支援【拖曳對調】與【一鍵設為封面】的圖片微縮圖區塊
     function renderThumbnails(imageUrlStr, fruitIdx) {
       if (!imageUrlStr) {
         return `<div class="w-16 h-16 rounded-xl bg-slate-200 border flex items-center justify-center text-slate-400 text-xs font-bold flex-shrink-0">無圖片</div>`;
@@ -195,10 +195,18 @@
                ondragover="handleDragOver(event)"
                ondrop="handleDrop(event, ${fruitIdx}, ${imgIdx})"
                class="w-16 h-16 object-cover rounded-xl bg-slate-200 border shadow-sm cursor-grab active:cursor-grabbing hover:ring-2 hover:ring-emerald-500 transition" 
-               title="按住拖曳可調整順序 (第一張為封面圖)">
+               title="按住拖曳可與其他圖片對調位置">
           
-          <!-- 第一張顯示封面標籤 -->
-          ${imgIdx === 0 ? `<span class="absolute bottom-0 left-0 right-0 bg-emerald-600 text-white text-[9px] font-bold text-center py-0.5 rounded-b-xl opacity-90">封面圖</span>` : ''}
+          <!-- 第一張顯示封面標籤，其餘顯示設為封面按鈕 -->
+          ${imgIdx === 0 ? `
+            <span class="absolute bottom-0 left-0 right-0 bg-emerald-600 text-white text-[9px] font-bold text-center py-0.5 rounded-b-xl opacity-90">封面圖</span>
+          ` : `
+            <button type="button" 
+                    onclick="setAsCover(${fruitIdx},${imgIdx})" 
+                    class="absolute bottom-0 left-0 right-0 bg-slate-800/80 hover:bg-emerald-600 text-white text-[9px] font-bold text-center py-0.5 rounded-b-xl transition opacity-90">
+              設為封面
+            </button>
+          `}
 
           <!-- 單圖快速刪除按鈕 -->
           <button type="button" 
@@ -220,6 +228,7 @@
       e.dataTransfer.dropEffect = 'move';
     }
 
+    // 💡 放開時：將拖曳圖片與目標圖片位置直接對調 (Swap)
     function handleDrop(e, targetFruitIdx, targetImgIdx) {
       e.preventDefault();
       if (!draggedImgInfo) return;
@@ -231,11 +240,24 @@
 
       let urls = (fruitsData[fruitIdx].imageUrl || "").split(/[\n,]+/).map(u => u.trim()).filter(u => u.length > 0);
       
-      // 挪動圖片位置
-      const draggedUrl = urls.splice(imgIdx, 1)[0];
-      urls.splice(targetImgIdx, 0, draggedUrl);
+      // 兩張圖片位置直接對調
+      const temp = urls[imgIdx];
+      urls[imgIdx] = urls[targetImgIdx];
+      urls[targetImgIdx] = temp;
 
       // 更新資料並重新渲染
+      fruitsData[fruitIdx].imageUrl = urls.join(',');
+      renderAdminFruits();
+    }
+
+    // 💡 一鍵將指定圖片設為封面圖 (移至第一張)
+    function setAsCover(fruitIdx, imgIdx) {
+      let urls = (fruitsData[fruitIdx].imageUrl || "").split(/[\n,]+/).map(u => u.trim()).filter(u => u.length > 0);
+      if (imgIdx === 0 || imgIdx >= urls.length) return;
+
+      const targetUrl = urls.splice(imgIdx, 1)[0];
+      urls.unshift(targetUrl);
+
       fruitsData[fruitIdx].imageUrl = urls.join(',');
       renderAdminFruits();
     }
@@ -259,12 +281,12 @@
       container.innerHTML = fruitsData.map((f, idx) => `
         <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 relative shadow-sm" data-id="${f.id}">
           
-          <!-- 上半部：圖片預覽列 (支援拖曳) + 水果名稱 -->
+          <!-- 上半部：圖片預覽列 (支援拖曳對調) + 水果名稱 -->
           <div class="space-y-2">
             <div class="flex items-center gap-2 overflow-x-auto pb-1 min-h-[72px]" id="img-preview-box-${idx}">
               ${renderThumbnails(f.imageUrl, idx)}
             </div>
-            <p class="text-[11px] text-slate-400 font-bold">💡 提示：按住圖片可拖曳調整順序 (排在第 1 張為封面圖)</p>
+            <p class="text-[11px] text-slate-400 font-bold">💡 提示：按住圖片可拖曳對調位置，或點擊「設為封面」直接置頂</p>
 
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">水果名稱</label>
