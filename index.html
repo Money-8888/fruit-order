@@ -1,1605 +1,844 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阿咘奶粉錢 - 線上訂購網</title>
-  <!-- 導入 Tailwind CSS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>阿咘奶粉錢｜產地新鮮水果直送</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    html { scroll-behavior: smooth; }
+  </style>
 </head>
-<body class="bg-emerald-50/50 min-h-screen font-sans text-slate-800 pb-20">
+<body class="bg-stone-50 min-h-screen font-sans text-slate-800 pb-24">
 
-  <!-- 1. 頂部導覽列 (Header) -->
-  <header class="bg-emerald-600 text-white shadow-md sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+  <!-- 頂部導覽列 -->
+  <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center space-x-2">
-        <span class="text-2xl">🍎</span>
-        <h1 class="text-lg sm:text-xl font-bold tracking-wide">阿咘奶粉錢鮮果嚴選直銷網</h1>
+        <span class="text-2xl">👨‍🌾</span>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-wide leading-tight">阿咘奶粉錢</h1>
+          <p class="text-[11px] text-emerald-100">產地現採・新鮮直送</p>
+        </div>
       </div>
-      
-      <!-- 右側會員按鈕區塊 -->
-      <div id="nav-user-area">
-        <button onclick="openMemberModal()" class="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-xs text-emerald-100 transition shadow-sm font-medium">
+
+      <div class="flex items-center space-x-2">
+        <button onclick="openMemberModal()" id="nav-member-btn" class="text-xs bg-emerald-800 hover:bg-emerald-900 px-3 py-1.5 rounded-full font-bold transition flex items-center space-x-1 border border-emerald-600">
           <span>👤</span>
-          <span id="nav-user-name">會員登入 / 註冊</span>
+          <span id="nav-member-text">會員登入</span>
+        </button>
+        <button onclick="openCartModal()" class="text-xs bg-amber-400 hover:bg-amber-500 text-slate-900 px-3 py-1.5 rounded-full font-bold transition flex items-center space-x-1 shadow">
+          <span>🛒</span>
+          <span id="nav-cart-count">0</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- 2. 主內容區域 (Main Content) -->
-  <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
-    <!-- Banner 標語 -->
-    <div class="text-center max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
-      <h2 class="text-2xl sm:text-3xl font-extrabold text-emerald-900 mb-2">新鮮水果，輕鬆訂購 🥭</h2>
-      <p class="text-xs sm:text-sm text-slate-600">產地直送 ‧ 新鮮保證！選擇喜愛的水果加入購物車即可快速下單。</p>
+  <!-- 1. 首頁頂部「果園現況精選輪播看板」 -->
+  <section class="max-w-5xl mx-auto sm:px-4 sm:pt-4">
+    <div id="hero-carousel" class="relative w-full h-64 sm:h-80 md:h-96 bg-slate-900 sm:rounded-2xl overflow-hidden shadow-lg select-none">
+      <!-- 輪播圖片容器 -->
+      <div id="carousel-track" class="w-full h-full relative">
+        <div class="w-full h-full flex flex-col items-center justify-center text-white/80 space-y-2 bg-gradient-to-br from-emerald-800 to-emerald-950">
+          <span class="text-4xl animate-bounce">🌿</span>
+          <p class="text-sm font-bold">正在載入果園最新現況...</p>
+        </div>
+      </div>
+
+      <!-- 左右切換箭頭 -->
+      <button id="carousel-prev" onclick="prevSlide()" class="hidden absolute left-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/45 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-sm transition z-10">
+        ❮
+      </button>
+      <button id="carousel-next" onclick="nextSlide()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/45 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-sm transition z-10">
+        ❯
+      </button>
+
+      <!-- 底部指示點 -->
+      <div id="carousel-dots" class="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center space-x-1.5 z-10"></div>
+    </div>
+  </section>
+
+  <!-- 訂購與生鮮須知提示條 -->
+  <section class="max-w-5xl mx-auto px-3 sm:px-4 mt-4">
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-900 flex items-start gap-2.5 shadow-sm">
+      <span class="text-lg leading-none">📢</span>
+      <div class="space-y-1">
+        <p class="font-bold">產地新鮮採收說明：</p>
+        <p class="text-amber-800/90 leading-relaxed">下單後請於 48 小時內完成匯款並備註帳號後 5 碼；鮮果依採收順序安排出貨，送達後請於 24 小時內開箱檢查並冷藏保存。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 當季鮮果訂購列表 -->
+  <main class="max-w-5xl mx-auto px-3 sm:px-4 mt-5">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-lg font-bold text-slate-800 flex items-center gap-1.5">
+        <span>🍎</span>
+        <span>當季鮮果直購</span>
+      </h2>
+      <span class="text-xs text-slate-400">點擊縮圖可查看多角度現況</span>
     </div>
 
-    <!-- 水果品項清單 -->
-    <div class="flex items-center justify-between pt-2">
-      <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-        <span>📦</span> 本週當季水果
-      </h3>
-      <span class="text-xs text-slate-400">點擊 ＋ 號即可同步新增至購物車</span>
-    </div>
-
-    <div id="shop-fruit-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="col-span-full text-center py-12 text-slate-400">正在載入最新水果清單...</div>
+    <div id="fruit-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="col-span-full text-center py-12 text-slate-400">載入水果清單中...</div>
     </div>
   </main>
 
-  <!-- 3. 右下角懸浮購物車按鈕 (Floating Cart Button) -->
-  <div class="fixed bottom-6 right-6 z-40">
-    <button onclick="toggleCartDrawer()" class="bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition hover:scale-105 active:scale-95 relative">
-      <span class="text-2xl">🛒</span>
-      <!-- 購物車數量 Badge -->
-      <span id="floating-cart-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs font-black rounded-full h-6 w-6 flex items-center justify-center border-2 border-white shadow">0</span>
-    </button>
+  <!-- 底部懸浮購物車結帳列 -->
+  <div id="bottom-cart-bar" class="hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] p-3 z-40">
+    <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
+      <div>
+        <div class="text-xs text-slate-500">已選購 <span id="bar-total-qty" class="font-bold text-emerald-700">0</span> 斤鮮果</div>
+        <div class="text-lg font-extrabold text-emerald-700">合計：$<span id="bar-total-amount">0</span> 元</div>
+      </div>
+      <button onclick="openCartModal()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold px-6 py-2.5 rounded-xl shadow-md transition text-sm">
+        前往結帳 ➔
+      </button>
+    </div>
   </div>
 
-  <!-- 4. 側邊購物車抽屜 (無阻擋式，允許同時點擊主畫面) -->
-  <div id="cart-drawer" class="fixed inset-y-0 right-0 z-50 hidden pointer-events-none flex justify-end">
-    <!-- 抽屜本體 -->
-    <div class="w-[85vw] sm:w-96 bg-white shadow-2xl border-l border-emerald-100 h-full flex flex-col justify-between pointer-events-auto transform transition-transform duration-300">
-      <!-- 頂部標題 -->
-      <div class="p-4 border-b flex items-center justify-between bg-emerald-50">
-        <h3 class="font-bold text-emerald-900 text-lg flex items-center gap-2">🛒 我的購物車</h3>
-        <button onclick="toggleCartDrawer(false)" class="text-slate-400 hover:text-slate-600 font-bold text-xl px-2" title="關閉購物車面板">✕</button>
+  <!-- 3. 購物車與結帳 Modal -->
+  <div id="cart-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center z-50">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="p-4 border-b flex justify-between items-center bg-slate-50">
+        <h3 class="font-bold text-lg text-slate-800">🛒 購物車與收件資料</h3>
+        <button onclick="closeCartModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none">&times;</button>
       </div>
 
-      <!-- 中間商品明細 -->
-      <div id="cart-drawer-items" class="p-4 flex-1 overflow-y-auto space-y-3 divide-y divide-slate-100">
-        <div class="text-center text-slate-400 py-12">購物車內目前沒有商品喔！</div>
-      </div>
+      <div class="p-4 overflow-y-auto space-y-4 flex-1">
+        <!-- 購物車明細 -->
+        <div id="cart-items-list" class="space-y-2"></div>
 
-      <!-- 底部金額與結帳資料表單 -->
-      <div class="p-5 border-t bg-slate-50 space-y-4 max-h-[55vh] overflow-y-auto">
-        <div class="flex justify-between items-center text-slate-700 border-b pb-3">
-          <span class="font-bold">總金額：</span>
-          <span class="text-2xl font-black text-emerald-600">$<span id="cart-total-amount">0</span> 元</span>
+        <div class="flex justify-between items-center bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+          <span class="font-bold text-sm text-emerald-900">訂單總金額</span>
+          <span class="font-extrabold text-lg text-emerald-700">$<span id="modal-total-amount">0</span> 元</span>
         </div>
 
-        <!-- 收件資料輸入 -->
-        <div class="space-y-3 text-xs">
-          <p class="font-bold text-slate-700 text-sm flex items-center gap-1">📝 收件人配送資料</p>
-          <div>
-            <label class="block text-slate-600 font-medium mb-1">姓名 *</label>
-            <input type="text" id="order-name" required placeholder="收件人姓名" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+        <!-- 收件人表單 -->
+        <form id="checkout-form" onsubmit="submitOrder(event)" class="space-y-3 pt-1">
+          <div class="flex justify-between items-center">
+            <h4 class="font-bold text-sm text-slate-700">📦 收件配送資訊</h4>
+            <span id="member-autofill-badge" class="hidden text-[11px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">已自動帶入會員資料</span>
           </div>
-          <div>
-            <label class="block text-slate-600 font-medium mb-1">連絡電話 *</label>
-            <input type="tel" id="order-phone" required placeholder="例如：0912345678" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
-          </div>
-          <div>
-            <label class="block text-slate-600 font-medium mb-1">Email *</label>
-            <input type="email" id="order-email" required placeholder="收件電子信箱" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
-          </div>
-          <div>
-            <label class="block text-slate-600 font-medium mb-1">配送地址 *</label>
-            <input type="text" id="order-address" required placeholder="完整收件地址" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
-          </div>
-          <div>
-            <label class="block text-slate-600 font-medium mb-1">備註說明</label>
-            <textarea id="order-note" rows="2" placeholder="例如：方便收貨時間、匯款末五碼..." class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-          </div>
-        </div>
 
-        <button onclick="submitOrder()" id="btn-submit-order" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md transition active:scale-[0.99]">
-          確認送出訂單
-        </button>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">收件人姓名 *</label>
+              <input type="text" id="order-name" required placeholder="王小明" class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">聯絡手機 *</label>
+              <input type="tel" id="order-phone" required placeholder="0912345678" class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">電子信箱 Email（接收出貨與物流單號通知）*</label>
+            <input type="email" id="order-email" required placeholder="example@gmail.com" class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">宅配收件地址 *</label>
+            <input type="text" id="order-address" required placeholder="請填寫完整縣市與地址" class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">付款備註 / 帳號後 5 碼 / 配送時段</label>
+            <input type="text" id="order-note" placeholder="例如：已轉帳後5碼 12345、希望上午到貨" class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+
+          <button type="submit" id="btn-submit-order" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md transition text-base">
+            ✅ 確認送出訂單
+          </button>
+        </form>
       </div>
     </div>
   </div>
 
-  <!-- 5. 會員中心 / 登入 / 註冊 / 忘記密碼 彈窗 (Member Modal) -->
-  <div id="member-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-    <div onclick="closeMemberModal()" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
-    
-    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden z-10 my-8 flex flex-col max-h-[90vh]">
-      <!-- 標題與 Tab 切換 -->
-      <div class="bg-slate-50 p-4 border-b flex items-center justify-between">
-        <div id="member-modal-tabs" class="flex space-x-1 sm:space-x-2">
-          <button id="tab-btn-login" onclick="switchMemberTab('login')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white">會員登入</button>
-          <button id="tab-btn-register" onclick="switchMemberTab('register')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600">免費註冊</button>
-          <button id="tab-btn-forgot" onclick="switchMemberTab('forgot')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600">忘記密碼</button>
-        </div>
-        <div id="member-modal-title-logged" class="hidden font-bold text-slate-800 text-base flex items-center gap-2">
-          👤 會員中心
-        </div>
-        <button onclick="closeMemberModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg px-2">✕</button>
+  <!-- 4. 會員中心 Modal (登入 / 註冊 / 忘記密碼 / 歷史訂單與物流追蹤) -->
+  <div id="member-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center z-50">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="p-4 border-b flex justify-between items-center bg-slate-50">
+        <h3 class="font-bold text-lg text-slate-800">👤 會員中心</h3>
+        <button onclick="closeMemberModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none">&times;</button>
       </div>
 
-      <div class="p-6 overflow-y-auto flex-1">
-        <!-- 表單 A：會員登入 -->
-        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-          <h3 class="font-bold text-slate-800 text-base">歡迎回來！請輸入登入資訊</h3>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">帳號</label>
-            <input type="text" id="login-account" required class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="請輸入自訂帳號或手機號碼">
-          </div>
-          <div>
-            <div class="flex justify-between items-center mb-1">
-              <label class="block text-xs font-bold text-slate-500">密碼</label>
-              <button type="button" onclick="switchMemberTab('forgot')" class="text-xs text-emerald-600 hover:text-emerald-700 hover:underline">忘記密碼？</button>
-            </div>
-            <input type="password" id="login-password" required class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="請輸入密碼">
-          </div>
-          <button type="submit" id="btn-login-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition">登入會員</button>
-        </form>
-
-        <!-- 表單 B：會員註冊 -->
-        <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3 hidden">
-          <h3 class="font-bold text-slate-800 text-base">加入會員</h3>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">設定帳號 *</label>
-            <input type="text" id="reg-account" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="建議英文數字組合">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">設定密碼 *</label>
-            <input type="password" id="reg-password" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="請輸入密碼">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">真實姓名 *</label>
-            <input type="text" id="reg-name" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="您的姓名">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">手機號碼 *</label>
-            <input type="tel" id="reg-phone" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="例如：0912345678">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">Email *</label>
-            <input type="email" id="reg-email" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="電子信箱">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">預設配送地址 *</label>
-            <input type="text" id="reg-address" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="常用收件地址">
-          </div>
-          <button type="submit" id="btn-register-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition mt-2">完成註冊</button>
-        </form>
-
-        <!-- 表單 C：忘記密碼 -->
-        <form id="form-forgot" onsubmit="handleForgotPassword(event)" class="space-y-3 hidden">
-          <h3 class="font-bold text-slate-800 text-base">忘記密碼查詢</h3>
-          <p class="text-xs text-slate-500 leading-relaxed">請輸入您註冊時的帳號、手機號碼與 Email，三個欄位完全正確後即可顯示密碼。</p>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">帳號 *</label>
-            <input type="text" id="forgot-account" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="請輸入帳號">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">手機號碼 *</label>
-            <input type="tel" id="forgot-phone" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="例如：0912345678">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">Email *</label>
-            <input type="email" id="forgot-email" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="請輸入 Email">
+      <div class="p-4 overflow-y-auto flex-1">
+        <!-- 未登入視圖 -->
+        <div id="member-guest-view" class="space-y-4">
+          <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl text-xs font-bold">
+            <button onclick="switchMemberAuthTab('login')" id="auth-tab-login" class="py-2 rounded-lg bg-white text-emerald-700 shadow-xs">會員登入</button>
+            <button onclick="switchMemberAuthTab('register')" id="auth-tab-register" class="py-2 rounded-lg text-slate-500">免費註冊</button>
+            <button onclick="switchMemberAuthTab('forgot')" id="auth-tab-forgot" class="py-2 rounded-lg text-slate-500">忘記密碼</button>
           </div>
 
-          <!-- 查詢結果顯示區域 -->
-          <div id="forgot-result" class="hidden bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl text-xs text-emerald-900 font-medium text-center space-y-1"></div>
-
-          <button type="submit" id="btn-forgot-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition mt-2">查詢密碼</button>
-        </form>
-
-        <!-- 區塊 D：登入後的個人中心、修改資料與歷史訂單 -->
-        <div id="member-profile-view" class="hidden space-y-5">
-          <div class="bg-emerald-50 p-4 rounded-2xl flex items-center justify-between border border-emerald-100">
+          <!-- 登入表單 -->
+          <form id="member-login-form" onsubmit="handleMemberLogin(event)" class="space-y-3">
             <div>
-              <p id="profile-user-name" class="font-bold text-emerald-900 text-base">姓名</p>
-              <p id="profile-user-account" class="text-xs text-emerald-700">帳號</p>
-              <p id="profile-user-phone" class="text-xs text-emerald-600">手機</p>
-            </div>
-            <div class="flex items-center space-x-2">
-              <button id="btn-toggle-edit-profile" onclick="toggleEditProfileView()" class="text-xs text-emerald-700 hover:bg-emerald-200 font-bold px-2.5 py-1 rounded-lg bg-emerald-100 transition">✏️ 修改資料</button>
-              <button onclick="handleLogout()" class="text-xs text-red-500 hover:bg-red-100 font-bold px-2 py-1 rounded bg-white/80 transition">登出</button>
-            </div>
-          </div>
-
-          <!-- 子頁面 1：歷史訂單列表 -->
-          <div id="subview-orders-list">
-            <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center justify-between">
-              <span class="flex items-center gap-1.5">📜 我的歷史訂單紀錄</span>
-              <span class="text-[11px] font-normal text-slate-400">點擊查看明細 🔍</span>
-            </h4>
-            <div id="member-orders-list" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
-              <div class="text-xs text-slate-400 text-center py-6">正在載入個人訂單...</div>
-            </div>
-          </div>
-
-          <!-- 子頁面 2：修改個人資料表單 (預設隱藏) -->
-          <form id="form-edit-profile" onsubmit="handleUpdateProfile(event)" class="hidden space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
-            <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center gap-1">✏️ 修改個人會員資料</h4>
-            <div>
-              <label class="block text-slate-400 font-medium mb-1">會員帳號 (不可修改)</label>
-              <input type="text" id="edit-account" disabled class="w-full px-3 py-2 border rounded-lg outline-none bg-slate-100 text-slate-500 font-bold">
+              <label class="block text-xs font-bold text-slate-600 mb-1">帳號 或 手機號碼</label>
+              <input type="text" id="m-login-key" required placeholder="請輸入帳號或 09xx手機" class="w-full px-3 py-2 border rounded-xl text-sm">
             </div>
             <div>
-              <label class="block text-slate-600 font-medium mb-1">真實姓名 *</label>
-              <input type="text" id="edit-name" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+              <label class="block text-xs font-bold text-slate-600 mb-1">密碼</label>
+              <input type="password" id="m-login-pass" required placeholder="請輸入密碼" class="w-full px-3 py-2 border rounded-xl text-sm">
             </div>
-            <div>
-              <label class="block text-slate-600 font-medium mb-1">手機號碼 *</label>
-              <input type="tel" id="edit-phone" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
-            </div>
-            <div>
-              <label class="block text-slate-600 font-medium mb-1">變更密碼 (若不修改請留空)</label>
-              <input type="password" id="edit-password" placeholder="留空代表維持原密碼" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
-            </div>
-            <div>
-              <label class="block text-slate-600 font-medium mb-1">Email *</label>
-              <input type="email" id="edit-email" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
-            </div>
-            <div>
-              <label class="block text-slate-600 font-medium mb-1">預設配送地址 *</label>
-              <input type="text" id="edit-address" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
-            </div>
-            <div class="flex gap-2 pt-2">
-              <button type="button" onclick="toggleEditProfileView(false)" class="w-1/2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-xl transition">取消</button>
-              <button type="submit" id="btn-save-profile" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl transition">儲存修改</button>
-            </div>
+            <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-sm shadow">登入會員</button>
           </form>
 
+          <!-- 註冊表單 -->
+          <form id="member-register-form" onsubmit="handleMemberRegister(event)" class="hidden space-y-2.5">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">設定帳號 *</label>
+                <input type="text" id="m-reg-acc" required placeholder="英文或數字" class="w-full px-3 py-2 border rounded-xl text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">設定密碼 *</label>
+                <input type="password" id="m-reg-pass" required placeholder="請設定密碼" class="w-full px-3 py-2 border rounded-xl text-sm">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">真實姓名 *</label>
+                <input type="text" id="m-reg-name" required placeholder="王小明" class="w-full px-3 py-2 border rounded-xl text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">手機號碼 *</label>
+                <input type="tel" id="m-reg-phone" required placeholder="0912345678" class="w-full px-3 py-2 border rounded-xl text-sm">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">電子信箱 Email *</label>
+              <input type="email" id="m-reg-email" required placeholder="用於接收通知與密碼查詢" class="w-full px-3 py-2 border rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">預設配送地址</label>
+              <input type="text" id="m-reg-addr" placeholder="填寫後結帳免重打" class="w-full px-3 py-2 border rounded-xl text-sm">
+            </div>
+            <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-sm shadow">立即註冊</button>
+          </form>
+
+          <!-- 忘記密碼表單 -->
+          <form id="member-forgot-form" onsubmit="handleMemberForgot(event)" class="hidden space-y-3">
+            <p class="text-xs text-slate-500">請輸入註冊時的帳號、手機與 Email 進行身分驗證：</p>
+            <input type="text" id="m-fg-acc" required placeholder="註冊帳號" class="w-full px-3 py-2 border rounded-xl text-sm">
+            <input type="tel" id="m-fg-phone" required placeholder="註冊手機號碼" class="w-full px-3 py-2 border rounded-xl text-sm">
+            <input type="email" id="m-fg-email" required placeholder="註冊 Email" class="w-full px-3 py-2 border rounded-xl text-sm">
+            <button type="submit" class="w-full bg-slate-800 text-white font-bold py-2.5 rounded-xl text-sm">查詢密碼</button>
+          </form>
         </div>
 
+        <!-- 已登入視圖 -->
+        <div id="member-logged-view" class="hidden space-y-4">
+          <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 flex justify-between items-center">
+            <div>
+              <div class="font-bold text-emerald-900 text-sm" id="logged-member-info">歡迎回來</div>
+              <div class="text-xs text-emerald-700" id="logged-member-sub"></div>
+            </div>
+            <button onclick="handleMemberLogout()" class="text-xs bg-white border border-red-200 text-red-600 px-3 py-1.5 rounded-lg font-bold">登出</button>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="font-bold text-sm text-slate-700">📋 歷史訂單與物流追蹤</h4>
+              <button onclick="loadMemberOrderHistory()" class="text-xs text-emerald-700 font-bold">🔄 重新整理</button>
+            </div>
+            <div id="member-orders-list" class="space-y-3">
+              <div class="text-center py-6 text-xs text-slate-400">載入歷史訂單中...</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- 6. 訂單詳細狀況彈窗 (Order Detail Modal) -->
-  <div id="order-detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-    <div onclick="closeOrderDetailModal()" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
-    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden z-10 my-8 flex flex-col max-h-[85vh]">
-      <!-- 標題區 -->
-      <div class="bg-emerald-600 text-white p-4 flex items-center justify-between">
-        <h3 class="font-bold text-base flex items-center gap-2">📦 訂單詳細資料</h3>
-        <button onclick="closeOrderDetailModal()" class="text-white hover:text-emerald-200 font-bold text-lg px-2">✕</button>
-      </div>
-
-      <!-- 內容明細區 -->
-      <div id="order-detail-content" class="p-5 overflow-y-auto space-y-4 text-xs">
-        <!-- JS 動態渲染 -->
-      </div>
-
-      <div class="p-4 border-t bg-slate-50 text-right">
-        <button onclick="closeOrderDetailModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition">關閉</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 7. JavaScript 邏輯控制區 -->
   <script>
-    // ⚠️ 您的 GAS 部署網址
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxQsDLOyagMbYOOw-uYBozoZXRRq5fmEutsZCn0Q3DjtNjq9Uf10PQ7zMsXETsy0UKf/exec";
 
     let fruitsData = [];
-    let cart = {}; // 格式: { fruitId: quantity }
-    let currentUser = null; // 儲存當前登入會員資料
-    let memberOrdersCache = []; // 快取歷史訂單資料
+    let carouselSlides = [];
+    let currentSlideIdx = 0;
+    let carouselTimer = null;
+    let touchStartX = 0;
+
+    let cart = {}; // { fruitId: qty }
+    let currentMember = null;
 
     window.onload = function() {
-      loadSavedUser();
-      loadFruits();
+      restoreMemberSession();
+      loadStoreData();
     };
 
-    // 通用 GAS API 呼叫函式
     async function callGasApi(action, extraData = {}) {
       try {
-        const payload = JSON.stringify({ action: action, ...extraData });
         const res = await fetch(GAS_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: payload
+          body: JSON.stringify({ action: action, ...extraData })
         });
         return await res.json();
       } catch (err) {
-        console.error("API 呼叫失敗:", err);
-        return { status: "error", message: "網路通訊失敗: " + err.message };
+        console.error("API 錯誤:", err);
+        return { status: "error", message: "網路連線失敗：" + err.message };
       }
     }
 
-    // ------------------- 1. 商品資料與載入 -------------------
-    async function loadFruits() {
+    // ------------------- 1. 載入商品與首頁現況輪播 -------------------
+
+    async function loadStoreData() {
       const res = await callGasApi("getFruits");
       if (res && res.status === "success") {
-        fruitsData = res.data || [];
-        renderShopFruits();
+        fruitsData = (res.data || []).filter(f => f.status === "ON");
+        carouselSlides = res.carouselSlides || [];
+
+        // 若後台尚未勾選任何輪播圖，預設使用上架水果封面圖作為輪播備援
+        if (carouselSlides.length === 0) {
+          fruitsData.forEach(f => {
+            const firstUrl = (f.imageUrl || "").split(",")[0].trim();
+            if (firstUrl) {
+              carouselSlides.push({
+                url: firstUrl,
+                caption: "產地新鮮採收直送",
+                fruitId: f.id,
+                fruitName: f.name,
+                price: f.price
+              });
+            }
+          });
+        }
+
+        renderHeroCarousel();
+        renderFruitsGrid();
       }
     }
 
-    function renderShopFruits() {
-      const container = document.getElementById('shop-fruit-list');
-      const activeFruits = fruitsData.filter(f => String(f.status || '').trim().toUpperCase() === 'ON');
-      
-      if (activeFruits.length === 0) {
-        container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">目前尚無上架的水果項目</div>`;
+    function renderHeroCarousel() {
+      const track = document.getElementById("carousel-track");
+      const dots = document.getElementById("carousel-dots");
+      const prevBtn = document.getElementById("carousel-prev");
+      const nextBtn = document.getElementById("carousel-next");
+
+      if (carouselSlides.length === 0) {
+        track.innerHTML = `
+          <div class="w-full h-full flex flex-col items-center justify-center text-white p-6 text-center bg-gradient-to-br from-emerald-700 to-emerald-900">
+            <span class="text-4xl mb-2">🍉</span>
+            <h2 class="text-xl font-bold">阿咘奶粉錢｜產地新鮮水果直送</h2>
+            <p class="text-xs text-emerald-100 mt-1">每日清晨新鮮採收，嚴選甜度與品質</p>
+          </div>`;
         return;
       }
-      
-      container.innerHTML = activeFruits.map(fruit => {
-        const stock = fruit.stock !== undefined ? Number(fruit.stock) : 0;
-        const isSoldOut = stock <= 0;
-        
-        let rawUrls = fruit.imageUrl || "";
-        let images = rawUrls.split(/[\n,]+/).map(url => url.trim()).filter(url => url.length > 0);
-        const mainImgUrl = images.length > 0 ? images[0] : "";
-        
-        return `
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition ${isSoldOut ? 'opacity-80' : ''}">
-            <div class="h-64 bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
-              ${mainImgUrl 
-                ? `<img id="main-img-${fruit.id}" src="${mainImgUrl}" referrerpolicy="no-referrer" class="w-full h-full object-contain p-2 transition-all duration-300">` 
-                : `<div class="w-full h-full flex items-center justify-center text-slate-300 text-4xl">🍎</div>`}
-              
-              <div class="absolute top-3 right-3 z-10">
-                ${isSoldOut 
-                  ? `<span class="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">已售完</span>`
-                  : `<span class="bg-emerald-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">剩餘 ${stock} 斤</span>`
-                }
-              </div>
-            </div>
-            
-            ${images.length > 1 ? `
-              <div class="flex items-center gap-2 px-4 pt-3 overflow-x-auto">
-                ${images.map((img, idx) => `
-                  <button onclick="switchFruitImage('${fruit.id}', '${img}', this)" 
-                          class="thumb-btn-${fruit.id} w-10 h-10 rounded-lg border-2 ${idx === 0 ? 'border-emerald-500' : 'border-transparent'} overflow-hidden flex-shrink-0 bg-slate-50 hover:opacity-80 transition">
-                    <img src="${img}" referrerpolicy="no-referrer" class="w-full h-full object-cover">
-                  </button>
-                `).join('')}
-              </div>
-            ` : ''}
-            
-            <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
-              <div>
-                <h3 class="text-lg font-bold text-slate-800">${fruit.name}</h3>
-                ${fruit.description 
-                  ? `<p class="text-xs text-slate-500 mt-1.5 leading-relaxed whitespace-pre-line bg-slate-50 p-2 rounded-lg border border-slate-100">${fruit.description}</p>` 
-                  : ''
-                }
-                <p class="text-emerald-600 font-extrabold text-xl mt-2">$${fruit.price} <span class="text-xs text-slate-400 font-normal">/ 斤</span></p>
-              </div>
-            
-              <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
-                <span class="text-xs font-bold text-slate-500 pl-2">數量(斤)</span>
-                <div class="flex items-center space-x-2">
-                  <button onclick="updateCart('${fruit.id}', -1)" ${isSoldOut ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-white border shadow-sm font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed">-</button>
-                  <span id="qty-${fruit.id}" class="w-8 text-center font-bold text-sm">${cart[fruit.id] || 0}</span>
-                  <button onclick="updateCart('${fruit.id}', 1, true)" ${isSoldOut ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-emerald-600 text-white shadow-sm font-bold hover:bg-emerald-700 active:scale-95 transition disabled:opacity-40 disabled:cursor-not-allowed" title="加入購物車">+</button>
-                </div>
-              </div>
-            </div>
+
+      if (carouselSlides.length > 1) {
+        prevBtn.classList.remove("hidden");
+        nextBtn.classList.remove("hidden");
+      }
+
+      track.innerHTML = carouselSlides.map((slide, i) => `
+        <div onclick="scrollToFruit('${slide.fruitId}')" 
+             class="carousel-slide absolute inset-0 transition-opacity duration-500 cursor-pointer ${i === 0 ? 'opacity-100 z-[1]' : 'opacity-0 pointer-events-none'}"
+             data-slide-idx="${i}">
+          <img src="${slide.url}" referrerpolicy="no-referrer" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent"></div>
+          
+          <!-- 左上角現況實拍標籤 -->
+          <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5 shadow">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>${slide.caption}</span>
           </div>
-        `;
-      }).join('');
-    }
-    
-    function switchFruitImage(fruitId, targetImgUrl, clickedBtn) {
-      const mainImg = document.getElementById(`main-img-${fruitId}`);
-      if (mainImg) mainImg.src = targetImgUrl;
-      
-      const allThumbs = document.querySelectorAll(`.thumb-btn-${fruitId}`);
-      allThumbs.forEach(btn => {
-        btn.classList.remove('border-emerald-500');
-        btn.classList.add('border-transparent');
-      });
-      if (clickedBtn) {
-        clickedBtn.classList.remove('border-transparent');
-        clickedBtn.classList.add('border-emerald-500');
-      }
-    }
 
-    // ------------------- 2. 購物車邏輯 -------------------
-    function updateCart(fruitId, delta, openDrawer = false) {
-      const fruit = fruitsData.find(f => f.id === fruitId);
-      if (!fruit) return;
-
-      const stock = fruit.stock !== undefined ? Number(fruit.stock) : 0;
-      const currentQty = cart[fruitId] || 0;
-      const newQty = currentQty + delta;
-
-      if (delta > 0 && newQty > stock) {
-        alert(`【${fruit.name}】目前剩餘庫存只有 ${stock} 斤喔！`);
-        return;
-      }
-
-      if (newQty <= 0) {
-        delete cart[fruitId];
-      } else {
-        cart[fruitId] = newQty;
-      }
-
-      const qtyElem = document.getElementById(`qty-${fruitId}`);
-      if (qtyElem) qtyElem.innerText = cart[fruitId] || 0;
-
-      renderCartUI();
-
-      if (openDrawer && delta > 0) {
-        toggleCartDrawer(true);
-      }
-    }
-
-    function renderCartUI() {
-      const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
-      const badge = document.getElementById('floating-cart-badge');
-      if (totalItems > 0) {
-        badge.innerText = totalItems;
-        badge.classList.remove('hidden');
-      } else {
-        badge.classList.add('hidden');
-      }
-
-      const container = document.getElementById('cart-drawer-items');
-      let totalAmount = 0;
-      const cartKeys = Object.keys(cart);
-
-      if (cartKeys.length === 0) {
-        container.innerHTML = `<div class="text-center text-slate-400 py-12">購物車內目前沒有商品喔！</div>`;
-        document.getElementById('cart-total-amount').innerText = '0';
-        return;
-      }
-
-      container.innerHTML = cartKeys.map(id => {
-        const fruit = fruitsData.find(f => f.id === id);
-        if (!fruit) return '';
-        const qty = cart[id];
-        const subtotal = fruit.price * qty;
-        totalAmount += subtotal;
-
-        let rawUrls = fruit.imageUrl || "";
-        let images = rawUrls.split(/[\n,]+/).map(url => url.trim()).filter(url => url.length > 0);
-        let cartImgUrl = images.length > 0 ? images[0] : "";
-
-        return `
-          <div class="py-3 flex items-center justify-between gap-2 border-b border-slate-100">
-            <div class="flex items-center space-x-3 min-w-0 flex-1">
-              <div class="w-12 h-12 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden flex items-center justify-center border border-slate-100">
-                ${cartImgUrl 
-                  ? `<img src="${cartImgUrl}" referrerpolicy="no-referrer" class="w-full h-full object-contain">`
-                  : `🍎`}
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="font-bold text-slate-800 text-sm truncate">${fruit.name}</p>
-                <p class="text-xs text-slate-400">$${fruit.price} / 斤</p>
-              </div>
+          <!-- 左下角水果名稱與價格引導 -->
+          <div class="absolute bottom-8 left-4 right-4 text-white flex justify-between items-end">
+            <div>
+              <div class="text-lg sm:text-2xl font-extrabold drop-shadow">${slide.fruitName}</div>
+              <div class="text-xs sm:text-sm text-emerald-300 font-bold">$${slide.price} 元 / 斤</div>
             </div>
-
-            <div class="flex items-center space-x-2 flex-shrink-0">
-              <div class="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200">
-                <button onclick="updateCart('${id}', -1)" class="w-6 h-6 rounded bg-white font-bold text-xs text-slate-600 hover:bg-slate-200 shadow-sm flex items-center justify-center">-</button>
-                <span class="w-7 text-center font-bold text-xs text-slate-800">${qty}</span>
-                <button onclick="updateCart('${id}', 1)" class="w-6 h-6 rounded bg-white font-bold text-xs text-slate-600 hover:bg-slate-200 shadow-sm flex items-center justify-center">+</button>
-              </div>
-
-              <span class="font-bold text-emerald-600 text-xs sm:text-sm w-12 text-right">$${subtotal}</span>
-              <button onclick="updateCart('${id}', -${qty})" class="text-slate-300 hover:text-red-500 font-bold text-xs px-1" title="清除品項">✕</button>
-            </div>
+            <span class="bg-emerald-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow">
+              立即選購 ↓
+            </span>
           </div>
-        `;
-      }).join('');
+        </div>
+      `).join('');
 
-      document.getElementById('cart-total-amount').innerText = totalAmount;
+      dots.innerHTML = carouselSlides.map((_, i) => `
+        <button onclick="goToSlide(${i})" class="carousel-dot h-2 rounded-full transition-all ${i === 0 ? 'w-6 bg-emerald-400' : 'w-2 bg-white/60'}"></button>
+      `).join('');
+
+      setupCarouselTouch();
+      startCarouselAutoPlay();
     }
 
-    function toggleCartDrawer(explicitState = null) {
-      const drawer = document.getElementById('cart-drawer');
-      if (explicitState !== null) {
-        if (explicitState) drawer.classList.remove('hidden');
-        else drawer.classList.add('hidden');
-      } else {
-        drawer.classList.toggle('hidden');
-      }
-    }
+    function updateSlideView() {
+      const slides = document.querySelectorAll(".carousel-slide");
+      const dots = document.querySelectorAll(".carousel-dot");
 
-    // ------------------- 3. 送出訂單 -------------------
-    async function submitOrder() {
-      const keys = Object.keys(cart);
-      if (keys.length === 0) {
-        alert("購物車內還沒有任何商品喔！");
-        return;
-      }
-
-      const name = document.getElementById('order-name').value.trim();
-      const phone = document.getElementById('order-phone').value.trim();
-      const email = document.getElementById('order-email').value.trim();
-      const address = document.getElementById('order-address').value.trim();
-      const note = document.getElementById('order-note').value.trim();
-
-      if (!name || !phone || !email || !address) {
-        alert("請完整填寫收件人姓名、連絡電話、Email 與配送地址！");
-        return;
-      }
-
-      let itemsSummaryArray = [];
-      let totalAmount = 0;
-
-      keys.forEach(id => {
-        const fruit = fruitsData.find(f => f.id === id);
-        if (fruit) {
-          const qty = cart[id];
-          itemsSummaryArray.push(`${fruit.name} x ${qty}斤`);
-          totalAmount += fruit.price * qty;
+      slides.forEach((el, i) => {
+        if (i === currentSlideIdx) {
+          el.classList.remove("opacity-0", "pointer-events-none");
+          el.classList.add("opacity-100", "z-[1]");
+        } else {
+          el.classList.remove("opacity-100", "z-[1]");
+          el.classList.add("opacity-0", "pointer-events-none");
         }
       });
 
-      const orderData = {
-        name: name,
-        phone: phone,
-        email: email,
-        address: address,
-        note: note,
-        items: itemsSummaryArray.join(", "),
-        totalAmount: totalAmount,
-        account: currentUser ? currentUser.account : ''
+      dots.forEach((dot, i) => {
+        dot.className = i === currentSlideIdx
+          ? "carousel-dot h-2 w-6 rounded-full bg-emerald-400 transition-all"
+          : "carousel-dot h-2 w-2 rounded-full bg-white/60 transition-all";
+      });
+    }
+
+    function nextSlide() {
+      if (carouselSlides.length <= 1) return;
+      currentSlideIdx = (currentSlideIdx + 1) % carouselSlides.length;
+      updateSlideView();
+      startCarouselAutoPlay();
+    }
+
+    function prevSlide() {
+      if (carouselSlides.length <= 1) return;
+      currentSlideIdx = (currentSlideIdx - 1 + carouselSlides.length) % carouselSlides.length;
+      updateSlideView();
+      startCarouselAutoPlay();
+    }
+
+    function goToSlide(idx) {
+      currentSlideIdx = idx;
+      updateSlideView();
+      startCarouselAutoPlay();
+    }
+
+    function startCarouselAutoPlay() {
+      if (carouselTimer) clearInterval(carouselTimer);
+      if (carouselSlides.length > 1) {
+        carouselTimer = setInterval(() => {
+          currentSlideIdx = (currentSlideIdx + 1) % carouselSlides.length;
+          updateSlideView();
+        }, 4500);
+      }
+    }
+
+    function setupCarouselTouch() {
+      const hero = document.getElementById("hero-carousel");
+      hero.ontouchstart = e => { touchStartX = e.changedTouches[0].screenX; };
+      hero.ontouchend = e => {
+        const diff = e.changedTouches[0].screenX - touchStartX;
+        if (Math.abs(diff) > 40) {
+          diff < 0 ? nextSlide() : prevSlide();
+        }
       };
+    }
 
-      const btn = document.getElementById('btn-submit-order');
-      btn.disabled = true;
-      btn.innerText = "提交訂單中...";
-
-      const res = await callGasApi("createOrder", orderData);
-
-      btn.disabled = false;
-      btn.innerText = "確認送出訂單";
-
-      if (res && res.status === "success") {
-        alert("🎉 " + (res.message || "訂單提交成功！") + "\n您的訂單編號為：" + res.orderId);
-        cart = {};
-        renderCartUI();
-        renderShopFruits();
-        toggleCartDrawer(false);
-      } else {
-        alert("訂單提交失敗：" + (res.message || "請稍後再試"));
+    function scrollToFruit(fruitId) {
+      const card = document.getElementById(`fruit-card-${fruitId}`);
+      if (card) {
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        card.classList.add("ring-4", "ring-emerald-400");
+        setTimeout(() => card.classList.remove("ring-4", "ring-emerald-400"), 1800);
       }
     }
 
-    // ------------------- 4. 會員系統控制 -------------------
-    function loadSavedUser() {
-      const saved = localStorage.getItem('ab_fruit_user');
-      if (saved) {
-        try {
-          currentUser = JSON.parse(saved);
-          updateUserNavUI();
-          autoFillCheckoutForm();
-        } catch(e) {}
-      }
-    }
+    // ------------------- 2. 水果商品卡片與手動縮圖切換 -------------------
 
-    function updateUserNavUI() {
-      const nameElem = document.getElementById('nav-user-name');
-      if (currentUser) {
-        nameElem.innerText = `你好，${currentUser.name}`;
-      } else {
-        nameElem.innerText = "會員登入 / 註冊";
-      }
-    }
-
-    function autoFillCheckoutForm() {
-      if (currentUser) {
-        document.getElementById('order-name').value = currentUser.name || '';
-        document.getElementById('order-phone').value = currentUser.phone || '';
-        document.getElementById('order-email').value = currentUser.email || '';
-        document.getElementById('order-address').value = currentUser.address || '';
-      }
-    }
-
-    function openMemberModal() {
-      document.getElementById('member-modal').classList.remove('hidden');
-      if (currentUser) {
-        document.getElementById('form-login').classList.add('hidden');
-        document.getElementById('form-register').classList.add('hidden');
-        document.getElementById('form-forgot').classList.add('hidden');
-        document.getElementById('member-modal-tabs').classList.add('hidden');
-        document.getElementById('member-modal-title-logged').classList.remove('hidden');
-        
-        document.getElementById('member-profile-view').classList.remove('hidden');
-        document.getElementById('profile-user-name').innerText = currentUser.name;
-        document.getElementById('profile-user-account').innerText = `👤 帳號：${currentUser.account || '無'}`;
-        document.getElementById('profile-user-phone').innerText = `📱 手機：${currentUser.phone || '未提供'}`;
-
-        toggleEditProfileView(false);
-        fetchMemberOrders();
-      } else {
-        document.getElementById('member-modal-tabs').classList.remove('hidden');
-        document.getElementById('member-modal-title-logged').classList.add('hidden');
-        document.getElementById('member-profile-view').classList.add('hidden');
-        switchMemberTab('login');
-      }
-    }
-
-    function closeMemberModal() {
-      document.getElementById('member-modal').classList.add('hidden');
-    }
-
-    function switchMemberTab(tab) {
-      const formLogin = document.getElementById('form-login');
-      const formRegister = document.getElementById('form-register');
-      const formForgot = document.getElementById('form-forgot');
-      
-      const tabLogin = document.getElementById('tab-btn-login');
-      const tabRegister = document.getElementById('tab-btn-register');
-      const tabForgot = document.getElementById('tab-btn-forgot');
-
-      formLogin.classList.add('hidden');
-      formRegister.classList.add('hidden');
-      formForgot.classList.add('hidden');
-
-      tabLogin.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600";
-      tabRegister.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600";
-      tabForgot.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600";
-
-      // 清除忘記密碼結果區
-      const resultDiv = document.getElementById('forgot-result');
-      if (resultDiv) resultDiv.classList.add('hidden');
-
-      if (tab === 'login') {
-        formLogin.classList.remove('hidden');
-        tabLogin.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white";
-      } else if (tab === 'register') {
-        formRegister.classList.remove('hidden');
-        tabRegister.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white";
-      } else if (tab === 'forgot') {
-        formForgot.classList.remove('hidden');
-        tabForgot.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white";
-      }
-    }
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      const account = document.getElementById('login-account').value.trim();
-      const pass = document.getElementById('login-password').value.trim();
-
-      const btn = document.getElementById('btn-login-submit');
-      btn.disabled = true;
-      btn.innerText = "驗證中...";
-
-      const res = await callGasApi("login", { account: account, password: pass });
-
-      btn.disabled = false;
-      btn.innerText = "登入會員";
-
-      if (res && res.status === 'success') {
-        currentUser = res.user;
-        localStorage.setItem('ab_fruit_user', JSON.stringify(currentUser));
-        updateUserNavUI();
-        autoFillCheckoutForm();
-        alert("登入成功！");
-        openMemberModal();
-      } else {
-        alert(res.message || "登入失敗，請驗證帳號與密碼！");
-      }
-    }
-
-    async function handleRegister(e) {
-      e.preventDefault();
-      const account = document.getElementById('reg-account').value.trim();
-      const pass = document.getElementById('reg-password').value.trim();
-      const name = document.getElementById('reg-name').value.trim();
-      const phone = document.getElementById('reg-phone').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      const address = document.getElementById('reg-address').value.trim();
-
-      if (!account || !pass || !name || !phone || !email || !address) {
-        alert("請完整填寫所有欄位！");
+    function renderFruitsGrid() {
+      const grid = document.getElementById("fruit-grid");
+      if (fruitsData.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">目前尚無上架中的水果</div>`;
         return;
       }
 
-      const btn = document.getElementById('btn-register-submit');
-      btn.disabled = true;
-      btn.innerText = "註冊資料提交中...";
+      grid.innerHTML = fruitsData.map(f => {
+        const items = (f.carouselItems && f.carouselItems.length > 0)
+          ? f.carouselItems
+          : (f.imageUrl ? f.imageUrl.split(",").map(u => ({ url: u.trim(), caption: "" })).filter(x => x.url) : []);
 
-      const res = await callGasApi("register", {
-        account: account,
-        password: pass,
-        name: name,
-        phone: phone,
-        email: email,
-        address: address
+        const coverUrl = items.length > 0 ? items[0].url : "";
+        const coverCaption = items.length > 0 ? items[0].caption : "";
+        const isSoldOut = f.stock <= 0;
+
+        return `
+        <div id="fruit-card-${f.id}" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col transition-all duration-300">
+          <!-- 主圖展示區 -->
+          <div class="relative w-full h-56 bg-slate-100">
+            ${coverUrl ? `
+              <img id="main-img-${f.id}" src="${coverUrl}" referrerpolicy="no-referrer" class="w-full h-full object-cover">
+            ` : `
+              <div class="w-full h-full flex items-center justify-center text-slate-400 text-sm font-bold">尚無圖片</div>
+            `}
+
+            <span id="main-cap-${f.id}" class="${coverCaption ? '' : 'hidden'} absolute bottom-2 left-2 bg-black/65 text-white text-[11px] font-bold px-2.5 py-1 rounded-full backdrop-blur-xs">
+              ${coverCaption}
+            </span>
+
+            <span class="absolute top-2.5 right-2.5 text-xs font-bold px-2.5 py-1 rounded-full shadow ${isSoldOut ? 'bg-red-600 text-white' : 'bg-white/90 text-emerald-800'}">
+              ${isSoldOut ? '已售完' : `剩餘 ${f.stock} 斤`}
+            </span>
+          </div>
+
+          <!-- 多圖手動切換縮圖列 -->
+          ${items.length > 1 ? `
+            <div class="flex items-center gap-1.5 px-3 pt-2.5 overflow-x-auto no-scrollbar">
+              ${items.map((it, idx) => `
+                <button type="button" 
+                        onclick="selectCardPhoto('${f.id}', '${it.url}', '${(it.caption || '').replace(/'/g, "\\'")}', this)"
+                        class="thumb-btn-${f.id} w-12 h-12 rounded-lg overflow-hidden border-2 flex-shrink-0 transition ${idx === 0 ? 'border-emerald-600' : 'border-transparent opacity-70 hover:opacity-100'}">
+                  <img src="${it.url}" referrerpolicy="no-referrer" class="w-full h-full object-cover">
+                </button>
+              `).join('')}
+            </div>
+          ` : ''}
+
+          <!-- 商品文字與下單區 -->
+          <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex justify-between items-start gap-2">
+                <h3 class="font-bold text-lg text-slate-800">${f.name}</h3>
+                <div class="text-emerald-700 font-extrabold text-lg whitespace-nowrap">$${f.price}<span class="text-xs font-normal text-slate-500"> /斤</span></div>
+              </div>
+              <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">${f.description || '產地新鮮現採，甜美多汁。'}</p>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 flex items-center gap-2">
+              <div class="flex items-center border border-slate-300 rounded-xl overflow-hidden bg-slate-50">
+                <button type="button" onclick="changeCardQty('${f.id}', -1)" class="px-3 py-2 text-slate-600 font-bold hover:bg-slate-200">-</button>
+                <input type="number" id="qty-input-${f.id}" value="1" min="1" max="${f.stock}" class="w-12 text-center bg-transparent text-sm font-bold outline-none">
+                <button type="button" onclick="changeCardQty('${f.id}', 1, ${f.stock})" class="px-3 py-2 text-slate-600 font-bold hover:bg-slate-200">+</button>
+              </div>
+
+              <button type="button" 
+                      ${isSoldOut ? 'disabled' : ''}
+                      onclick="addToCart('${f.id}')" 
+                      class="flex-1 py-2.5 rounded-xl font-bold text-sm transition shadow-xs ${
+                        isSoldOut 
+                          ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
+                          : 'bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white'
+                      }">
+                ${isSoldOut ? '補貨中' : '加入購物車'}
+              </button>
+            </div>
+          </div>
+        </div>
+        `;
+      }).join('');
+    }
+
+    function selectCardPhoto(fruitId, url, caption, btnEl) {
+      const mainImg = document.getElementById(`main-img-${fruitId}`);
+      const mainCap = document.getElementById(`main-cap-${fruitId}`);
+      if (mainImg) mainImg.src = url;
+      if (mainCap) {
+        if (caption) {
+          mainCap.innerText = caption;
+          mainCap.classList.remove("hidden");
+        } else {
+          mainCap.classList.add("hidden");
+        }
+      }
+
+      document.querySelectorAll(`.thumb-btn-${fruitId}`).forEach(b => {
+        b.classList.remove("border-emerald-600");
+        b.classList.add("border-transparent", "opacity-70");
       });
-
-      btn.disabled = false;
-      btn.innerText = "完成註冊";
-
-      if (res && res.status === 'success') {
-        alert("🎉 註冊成功！請直接登入");
-        switchMemberTab('login');
-        document.getElementById('login-account').value = account;
-      } else {
-        alert(res.message || "註冊失敗！");
-      }
+      btnEl.classList.remove("border-transparent", "opacity-70");
+      btnEl.classList.add("border-emerald-600");
     }
 
-    // ------------------- 5. 忘記密碼邏輯 -------------------
-    async function handleForgotPassword(e) {
-      e.preventDefault();
-      const account = document.getElementById('forgot-account').value.trim();
-      const phone = document.getElementById('forgot-phone').value.trim();
-      const email = document.getElementById('forgot-email').value.trim();
+    function changeCardQty(fruitId, delta, maxStock = 999) {
+      const input = document.getElementById(`qty-input-${fruitId}`);
+      if (!input) return;
+      let val = (parseInt(input.value, 10) || 1) + delta;
+      if (val < 1) val = 1;
+      if (maxStock > 0 && val > maxStock) val = maxStock;
+      input.value = val;
+    }
 
-      if (!account || !phone || !email) {
-        alert("請完整填寫帳號、手機號碼與 Email！");
+    // ------------------- 3. 購物車與結帳 -------------------
+
+    function addToCart(fruitId) {
+      const fruit = fruitsData.find(f => f.id === fruitId);
+      if (!fruit) return;
+
+      const input = document.getElementById(`qty-input-${fruitId}`);
+      const addQty = parseInt(input ? input.value : 1, 10) || 1;
+
+      const currentQty = cart[fruitId] || 0;
+      if (currentQty + addQty > fruit.stock) {
+        alert(`抱歉，「${fruit.name}」目前僅剩 ${fruit.stock} 斤！`);
         return;
       }
 
-      const btn = document.getElementById('btn-forgot-submit');
-      const resultDiv = document.getElementById('forgot-result');
-      
-      btn.disabled = true;
-      btn.innerText = "驗證中...";
-      resultDiv.classList.add('hidden');
+      cart[fruitId] = currentQty + addQty;
+      updateCartUI();
+    }
 
-      const res = await callGasApi("forgotPassword", {
-        account: account,
-        phone: phone,
-        email: email
-      });
+    function updateCartUI() {
+      let totalQty = 0;
+      let totalAmount = 0;
 
-      btn.disabled = false;
-      btn.innerText = "查詢密碼";
+      for (let id in cart) {
+        const f = fruitsData.find(x => x.id === id);
+        if (f && cart[id] > 0) {
+          totalQty += cart[id];
+          totalAmount += f.price * cart[id];
+        }
+      }
 
-      if (res && res.status === 'success') {
-        resultDiv.innerHTML = `🔐 驗證成功！您的密碼為：<div class="text-base text-emerald-900 font-extrabold underline tracking-wider mt-1">${res.password}</div>`;
-        resultDiv.classList.remove('hidden');
+      document.getElementById("nav-cart-count").innerText = totalQty;
+      document.getElementById("bar-total-qty").innerText = totalQty;
+      document.getElementById("bar-total-amount").innerText = totalAmount;
+      document.getElementById("modal-total-amount").innerText = totalAmount;
+
+      const bar = document.getElementById("bottom-cart-bar");
+      if (totalQty > 0) {
+        bar.classList.remove("hidden");
       } else {
-        alert(res.message || "驗證失敗！請確認資料是否完全正確。");
+        bar.classList.add("hidden");
       }
     }
 
-    function handleLogout() {
-      currentUser = null;
-      localStorage.removeItem('ab_fruit_user');
-      updateUserNavUI();
-      
-      document.getElementById('order-name').value = '';
-      document.getElementById('order-phone').value = '';
-      document.getElementById('order-email').value = '';
-      document.getElementById('order-address').value = '';
+    function openCartModal() {
+      const listEl = document.getElementById("cart-items-list");
+      const ids = Object.keys(cart).filter(id => cart[id] > 0);
 
-      closeMemberModal();
-      alert("已成功登出");
-    }
-
-    // ------------------- 6. 會員資料修改功能 -------------------
-    function toggleEditProfileView(show = null) {
-      const ordersView = document.getElementById('subview-orders-list');
-      const editForm = document.getElementById('form-edit-profile');
-      const toggleBtn = document.getElementById('btn-toggle-edit-profile');
-
-      const isHidden = editForm.classList.contains('hidden');
-      const targetState = show !== null ? show : isHidden;
-
-      if (targetState) {
-        ordersView.classList.add('hidden');
-        editForm.classList.remove('hidden');
-        toggleBtn.innerText = "📜 歷史訂單";
-
-        document.getElementById('edit-account').value = currentUser.account || '';
-        document.getElementById('edit-name').value = currentUser.name || '';
-        document.getElementById('edit-phone').value = currentUser.phone || '';
-        document.getElementById('edit-password').value = '';
-        document.getElementById('edit-email').value = currentUser.email || '';
-        document.getElementById('edit-address').value = currentUser.address || '';
-      } else {
-        ordersView.classList.remove('hidden');
-        editForm.classList.add('hidden');
-        toggleBtn.innerText = "✏️ 修改資料";
-      }
-    }
-
-    async function handleUpdateProfile(e) {
-      e.preventDefault();
-      const newName = document.getElementById('edit-name').value.trim();
-      const newPhone = document.getElementById('edit-phone').value.trim();
-      const newPass = document.getElementById('edit-password').value.trim();
-      const newEmail = document.getElementById('edit-email').value.trim();
-      const newAddress = document.getElementById('edit-address').value.trim();
-
-      if (!newName || !newPhone || !newEmail || !newAddress) {
-        alert("姓名、手機號碼、Email 與預設地址不可為空！");
+      if (ids.length === 0) {
+        alert("購物車目前是空的，請先選購水果！");
         return;
       }
 
-      const btn = document.getElementById('btn-save-profile');
+      listEl.innerHTML = ids.map(id => {
+        const f = fruitsData.find(x => x.id === id);
+        if (!f) return "";
+        return `
+          <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-sm">
+            <div>
+              <div class="font-bold text-slate-800">${f.name}</div>
+              <div class="text-xs text-slate-500">$${f.price} / 斤</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="adjustCartItem('${id}', -1)" class="w-7 h-7 rounded-lg bg-white border font-bold text-slate-600">-</button>
+              <span class="font-bold w-8 text-center">${cart[id]}斤</span>
+              <button type="button" onclick="adjustCartItem('${id}', 1)" class="w-7 h-7 rounded-lg bg-white border font-bold text-slate-600">+</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (currentMember) {
+        document.getElementById("order-name").value = currentMember.name || "";
+        document.getElementById("order-phone").value = currentMember.phone || "";
+        document.getElementById("order-email").value = currentMember.email || "";
+        document.getElementById("order-address").value = currentMember.address || "";
+        document.getElementById("member-autofill-badge").classList.remove("hidden");
+      }
+
+      document.getElementById("cart-modal").classList.remove("hidden");
+    }
+
+    function closeCartModal() {
+      document.getElementById("cart-modal").classList.add("hidden");
+    }
+
+    function adjustCartItem(id, delta) {
+      const f = fruitsData.find(x => x.id === id);
+      if (!f) return;
+      const next = (cart[id] || 0) + delta;
+      if (next <= 0) {
+        delete cart[id];
+      } else if (next <= f.stock) {
+        cart[id] = next;
+      }
+      updateCartUI();
+      if (Object.keys(cart).length === 0) {
+        closeCartModal();
+      } else {
+        openCartModal();
+      }
+    }
+
+    async function submitOrder(e) {
+      e.preventDefault();
+      const btn = document.getElementById("btn-submit-order");
       btn.disabled = true;
-      btn.innerText = "儲存中...";
+      btn.innerText = "⏳ 訂單傳送中...";
+
+      let totalAmount = 0;
+      const summaryParts = [];
+      for (let id in cart) {
+        const f = fruitsData.find(x => x.id === id);
+        if (f && cart[id] > 0) {
+          totalAmount += f.price * cart[id];
+          summaryParts.push(`${f.name} x ${cart[id]}斤`);
+        }
+      }
 
       const payload = {
-        account: currentUser.account,
-        name: newName,
-        phone: newPhone,
-        password: newPass,
-        email: newEmail,
-        address: newAddress
-      };
-
-      const res = await callGasApi("updateProfile", payload);
-
-      btn.disabled = false;
-      btn.innerText = "儲存修改";
-
-      if (res && res.status === 'success') {
-        alert("✨ 個人資料修改成功！");
-        currentUser.name = newName;
-        currentUser.phone = newPhone;
-        currentUser.email = newEmail;
-        currentUser.address = newAddress;
-        localStorage.setItem('ab_fruit_user', JSON.stringify(currentUser));
-
-        document.getElementById('profile-user-name').innerText = currentUser.name;
-        document.getElementById('profile-user-phone').innerText = `📱 手機：${currentUser.phone}`;
-        updateUserNavUI();
-        autoFillCheckoutForm();
-        toggleEditProfileView(false);
-      } else {
-        alert("修改失敗：" + (res.message || "請稍後再試"));
-      }
-    }
-
-    // ------------------- 7. 歷史訂單與詳細資料查詢 -------------------
-    async function fetchMemberOrders() {
-      const container = document.getElementById('member-orders-list');
-      container.innerHTML = `<div class="text-xs text-slate-400 text-center py-6">正在載入個人訂單...</div>`;
-
-      const res = await callGasApi("getMemberOrders", { 
-        account: currentUser.account,
-        phone: currentUser.phone 
-      });
-
-      if (res && res.status === 'success') {
-        memberOrdersCache = res.data || [];
-        if (memberOrdersCache.length === 0) {
-          container.innerHTML = `<div class="text-xs text-slate-400 text-center py-6">您目前還沒有任何訂單紀錄喔！</div>`;
-          return;
-        }
-
-        container.innerHTML = memberOrdersCache.map((ord, index) => `
-          <div onclick="openOrderDetail(${index})" class="bg-slate-50 hover:bg-emerald-50/80 p-3 rounded-xl border border-slate-200 hover:border-emerald-300 text-xs space-y-1.5 transition cursor-pointer group shadow-sm">
-            <div class="flex justify-between items-center font-bold">
-              <span class="text-slate-800 group-hover:text-emerald-800 flex items-center gap-1">
-                📌 ${ord.orderId}
-              </span>
-              <span class="px-2 py-0.5 rounded-full text-[10px] ${ord.status === '已完成' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-amber-100 text-amber-700 border border-amber-200'}">${ord.status || '處理中'}</span>
-            </div>
-            <p class="text-slate-500 truncate">${ord.items}</p>
-            <div class="flex justify-between items-center text-slate-400 pt-1 border-t border-slate-100">
-              <span>${ord.time}</span>
-              <span class="font-black text-slate-800 text-sm group-hover:text-emerald-600">$${ord.totalAmount} 元</span>
-            </div>
-          </div>
-        `).join('');
-      } else {
-        container.innerHTML = `<div class="text-xs text-red-400 text-center py-6">無法讀取歷史訂單</div>`;
-      }
-    }
-
-    function openOrderDetail(orderIndex) {
-      const ord = memberOrdersCache[orderIndex];
-      if (!ord) return;
-
-      const content = document.getElementById('order-detail-content');
-      content.innerHTML = `
-        <div class="bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-100 space-y-2">
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-slate-500">訂單編號</span>
-            <span class="font-black text-slate-800 text-sm">${ord.orderId}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-slate-500">下單時間</span>
-            <span class="text-slate-700">${ord.time || '未提供'}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-slate-500">訂單狀態</span>
-            <span class="px-2.5 py-0.5 rounded-full font-bold text-[11px] ${ord.status === '已完成' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${ord.status || '處理中'}</span>
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <p class="font-bold text-slate-800 text-sm flex items-center gap-1">🛍️ 訂購品項與金額</p>
-          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 leading-relaxed text-slate-700 whitespace-pre-line">
-            ${ord.items ? ord.items.split(', ').join('\n') : '無品項說明'}
-          </div>
-          <div class="flex justify-between items-center p-2 bg-emerald-50 rounded-xl text-slate-800">
-            <span class="font-bold">訂單總金額</span>
-            <span class="text-xl font-black text-emerald-600">$${ord.totalAmount} 元</span>
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <p class="font-bold text-slate-800 text-sm flex items-center gap-1">📍 收件資訊</p>
-          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-1.5 text-slate-600">
-            <p><span class="font-bold text-slate-500">收件姓名：</span>${ord.name || currentUser.name || '未提供'}</p>
-            <p><span class="font-bold text-slate-500">聯絡電話：</span>${ord.phone || currentUser.phone || '未提供'}</p>
-            <p><span class="font-bold text-slate-500">Email：</span>${ord.email || currentUser.email || '未提供'}</p>
-            <p><span class="font-bold text-slate-500">配送地址：</span>${ord.address || currentUser.address || '未提供'}</p>
-            ${ord.note ? `<p class="pt-1 border-t border-slate-200"><span class="font-bold text-slate-500">買家備註：</span>${ord.note}</p>` : ''}
-          </div>
-        </div>
-      `;
-
-      document.getElementById('order-detail-modal').classList.remove('hidden');
-    }
-
-    function closeOrderDetailModal() {
-      document.getElementById('order-detail-modal').classList.add('hidden');
-    }
-  </script>
-</body>
-</html>
-
-<template>
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阿咘奶粉錢 - 線上訂購網</title>
-  <!-- 導入 Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-emerald-50/50 min-h-screen font-sans text-slate-800 pb-20">
-
-  <!-- 1. 頂部導覽列 (Header) -->
-  <header class="bg-emerald-600 text-white shadow-md sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center space-x-2">
-        <span class="text-2xl">🍎</span>
-        <h1 class="text-lg sm:text-xl font-bold tracking-wide">阿咘奶粉錢鮮果嚴選直銷網</h1>
-      </div>
-      
-      <!-- 右側會員按鈕區塊 -->
-      <div id="nav-user-area">
-        <button onclick="openMemberModal()" class="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-xs text-emerald-100 transition shadow-sm font-medium">
-          <span>👤</span>
-          <span id="nav-user-name">會員登入 / 註冊</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- 2. 主內容區域 (Main Content) -->
-  <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
-    <!-- Banner 標語 -->
-    <div class="text-center max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
-      <h2 class="text-2xl sm:text-3xl font-extrabold text-emerald-900 mb-2">新鮮水果，輕鬆訂購 🥭</h2>
-      <p class="text-xs sm:text-sm text-slate-600">產地直送 ‧ 新鮮保證！選擇喜愛的水果加入購物車即可快速下單。</p>
-    </div>
-
-    <!-- 水果品項清單 -->
-    <div class="flex items-center justify-between pt-2">
-      <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-        <span>📦</span> 本週當季水果
-      </h3>
-      <span class="text-xs text-slate-400">點擊 ＋ 號加入購物車</span>
-    </div>
-
-    <div id="shop-fruit-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="col-span-full text-center py-12 text-slate-400">正在載入最新水果清單...</div>
-    </div>
-  </main>
-
-  <!-- 3. 右下角懸浮購物車按鈕 (Floating Cart Button) -->
-  <div class="fixed bottom-6 right-6 z-40">
-    <button onclick="toggleCartDrawer(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition hover:scale-105 active:scale-95 relative">
-      <span class="text-2xl">🛒</span>
-      <!-- 購物車數量 Badge -->
-      <span id="floating-cart-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs font-black rounded-full h-6 w-6 flex items-center justify-center border-2 border-white shadow">0</span>
-    </button>
-  </div>
-
-  <!-- 4. 側邊購物車抽屜 (Cart Drawer Modal) -->
-  <div id="cart-drawer" class="fixed inset-0 z-50 hidden">
-    <!-- 背景遮罩 -->
-    <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"></div>
-    
-    <!-- 抽屜內容 -->
-    <div class="absolute inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl flex flex-col justify-between transform transition-transform duration-300">
-      <!-- 頂部標題 -->
-      <div class="p-4 border-b flex items-center justify-between bg-emerald-50">
-        <h3 class="font-bold text-emerald-900 text-lg flex items-center gap-2">🛒 我的購物車</h3>
-        <button onclick="toggleCartDrawer(false)" class="text-slate-400 hover:text-slate-600 font-bold text-xl px-2">✕</button>
-      </div>
-
-      <!-- 中間商品明細 -->
-      <div id="cart-drawer-items" class="p-4 flex-1 overflow-y-auto space-y-3 divide-y divide-slate-100">
-        <div class="text-center text-slate-400 py-12">購物車內目前沒有商品喔！</div>
-      </div>
-
-      <!-- 底部金額與結帳資料表單 -->
-      <div class="p-5 border-t bg-slate-50 space-y-4 max-h-[60vh] overflow-y-auto">
-        <div class="flex justify-between items-center text-slate-700 border-b pb-3">
-          <span class="font-bold">總金額：</span>
-          <span class="text-2xl font-black text-emerald-600">$<span id="cart-total-amount">0</span> 元</span>
-        </div>
-
-        <!-- 收件資料輸入 -->
-        <div class="space-y-3 text-xs">
-          <p class="font-bold text-slate-700 text-sm flex items-center gap-1">📝 收件人配送資料</p>
-          <div>
-            <label class="block text-slate-600 font-medium mb-1">姓名 *</label>
-            <input type="text" id="order-name" required placeholder="收件人姓名" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
-          </div>
-          <div>
-            <label class="block text-slate-600 font-medium mb-1">電話 *</label>
-            <input type="tel" id="order-phone" required placeholder="連絡電話" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
-          </div>
-          <div>
-            <label class="block text-slate-600 font-medium mb-1">Email</label>
-            <input type="email" id="order-email" placeholder="收件電子信箱 (選填)" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
-          </div>
-          <div>
-            <label class="block text-slate-600 font-medium mb-1">配送地址 *</label>
-            <input type="text" id="order-address" required placeholder="完整收件地址" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
-          </div>
-          <div>
-            <label class="block text-slate-600 font-medium mb-1">備註說明</label>
-            <textarea id="order-note" rows="2" placeholder="例如：方便收貨時間、匯款末五碼..." class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-          </div>
-        </div>
-
-        <button onclick="submitOrder()" id="btn-submit-order" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md transition active:scale-[0.99]">
-          確認送出訂單
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 5. 會員中心 / 登入 / 註冊 彈窗 (Member Modal) -->
-  <div id="member-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-    <div onclick="closeMemberModal()" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
-    
-    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden z-10 my-8 flex flex-col max-h-[90vh]">
-      <!-- 標題與 Tab 切換 -->
-      <div class="bg-slate-50 p-4 border-b flex items-center justify-between">
-        <div id="member-modal-tabs" class="flex space-x-2">
-          <button id="tab-btn-login" onclick="switchMemberTab('login')" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white">會員登入</button>
-          <button id="tab-btn-register" onclick="switchMemberTab('register')" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600">免費註冊</button>
-        </div>
-        <button onclick="closeMemberModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg px-2">✕</button>
-      </div>
-
-      <div class="p-6 overflow-y-auto flex-1">
-        <!-- 表單 A：會員登入 -->
-        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-          <h3 class="font-bold text-slate-800 text-base">歡迎回來！請輸入登入資訊</h3>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">手機號碼 (帳號)</label>
-            <input type="tel" id="login-phone" required class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="例如：0912345678">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">密碼</label>
-            <input type="password" id="login-password" required class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="請輸入密碼">
-          </div>
-          <button type="submit" id="btn-login-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition">登入會員</button>
-        </form>
-
-        <!-- 表單 B：會員註冊 -->
-        <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3 hidden">
-          <h3 class="font-bold text-slate-800 text-base">加入會員</h3>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">姓名 *</label>
-            <input type="text" id="reg-name" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="您的真實姓名">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">手機號碼 (做為帳號) *</label>
-            <input type="tel" id="reg-phone" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="0912345678">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">設定密碼 *</label>
-            <input type="password" id="reg-password" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="登入密碼">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">Email</label>
-            <input type="email" id="reg-email" class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="電子信箱 (選填)">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">預設配送地址</label>
-            <input type="text" id="reg-address" class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500" placeholder="常用收件地址 (選填)">
-          </div>
-          <button type="submit" id="btn-register-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition mt-2">完成註冊</button>
-        </form>
-
-        <!-- 區塊 C：登入後的個人中心與歷史訂單 -->
-        <div id="member-profile-view" class="hidden space-y-5">
-          <div class="bg-emerald-50 p-4 rounded-2xl flex items-center justify-between border border-emerald-100">
-            <div>
-              <p id="profile-user-name" class="font-bold text-emerald-900 text-base">姓名</p>
-              <p id="profile-user-phone" class="text-xs text-emerald-700">電話</p>
-            </div>
-            <button onclick="handleLogout()" class="text-xs text-red-500 hover:underline font-bold px-2 py-1 rounded bg-white/80">登出</button>
-          </div>
-
-          <div>
-            <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-1.5">
-              <span>📜</span> 我的歷史訂單紀錄
-            </h4>
-            <div id="member-orders-list" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-              <div class="text-xs text-slate-400 text-center py-6">正在載入個人訂單...</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-
-  <!-- 6. JavaScript 邏輯控制區 -->
-  <script>
-    // ⚠️ 您的 GAS 部署網址
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxQsDLOyagMbYOOw-uYBozoZXRRq5fmEutsZCn0Q3DjtNjq9Uf10PQ7zMsXETsy0UKf/exec";
-
-    let fruitsData = [];
-    let cart = {}; // 格式: { fruitId: quantity }
-    let currentUser = null; // 儲存當前登入會員資料
-
-    window.onload = function() {
-      loadSavedUser();
-      loadFruits();
-    };
-
-    // 通用 GAS API 呼叫函式
-    async function callGasApi(action, extraData = {}) {
-      try {
-        const payload = JSON.stringify({ action: action, ...extraData });
-        const res = await fetch(GAS_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: payload
-        });
-        return await res.json();
-      } catch (err) {
-        console.error("API 呼叫失敗:", err);
-        return { status: "error", message: "網路通訊失敗: " + err.message };
-      }
-    }
-
-    // ------------------- 1. 商品資料與載入 -------------------
-    async function loadFruits() {
-      const res = await callGasApi("getFruits");
-      if (res && res.status === "success") {
-        fruitsData = res.data || [];
-        renderShopFruits();
-      }
-    }
-
-// 💡 升級版：支援「多張圖片」展示與縮圖點擊切換
-    function renderShopFruits() {
-      const container = document.getElementById('shop-fruit-list');
-      const activeFruits = fruitsData.filter(f => f.status === 'ON');
-    
-      if (activeFruits.length === 0) {
-        container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">目前尚無上架的水果項目</div>`;
-        return;
-      }
-    
-      container.innerHTML = activeFruits.map(fruit => {
-        const stock = fruit.stock !== undefined ? Number(fruit.stock) : 0;
-        const isSoldOut = stock <= 0;
-    
-        // 拆解圖片網址 (支援用逗號或換行隔開多張網址)
-        let rawUrls = fruit.imageUrl || "";
-        let images = rawUrls.split(/[\n,]+/).map(url => url.trim()).filter(url => url.length > 0);
-        
-        // 預設展示第一張圖
-        const mainImgUrl = images.length > 0 ? images[0] : "";
-    
-        return `
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition ${isSoldOut ? 'opacity-80' : ''}">
-            
-            <!-- 1. 主圖片區塊 -->
-            <div class="h-64 bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
-              ${mainImgUrl 
-                ? `<img id="main-img-${fruit.id}" src="${mainImgUrl}" referrerpolicy="no-referrer" class="w-full h-full object-contain p-2 transition-all duration-300">` 
-                : `<div class="w-full h-full flex items-center justify-center text-slate-300 text-4xl">🍎</div>`}
-              
-              <!-- 剩餘庫存標籤 -->
-              <div class="absolute top-3 right-3 z-10">
-                ${isSoldOut 
-                  ? `<span class="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">已售完</span>`
-                  : `<span class="bg-emerald-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">剩餘 ${stock} 斤</span>`
-                }
-              </div>
-            </div>
-    
-            <!-- 2. 多張縮圖切換區塊 (只有當圖片超過 1 張時才顯示) -->
-            ${images.length > 1 ? `
-              <div class="flex items-center gap-2 px-4 pt-3 overflow-x-auto">
-                ${images.map((img, idx) => `
-                  <button onclick="switchFruitImage('${fruit.id}', '${img}', this)" 
-                          class="thumb-btn-${fruit.id} w-10 h-10 rounded-lg border-2 ${idx === 0 ? 'border-emerald-500' : 'border-transparent'} overflow-hidden flex-shrink-0 bg-slate-50 hover:opacity-80 transition">
-                    <img src="${img}" referrerpolicy="no-referrer" class="w-full h-full object-cover">
-                  </button>
-                `).join('')}
-              </div>
-            ` : ''}
-    
-            <!-- 3. 商品文字與說明區塊 -->
-            <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
-              <div>
-                <h3 class="text-lg font-bold text-slate-800">${fruit.name}</h3>
-                
-                ${fruit.description 
-                  ? `<p class="text-xs text-slate-500 mt-1.5 leading-relaxed whitespace-pre-line bg-slate-50 p-2 rounded-lg border border-slate-100">${fruit.description}</p>` 
-                  : ''
-                }
-    
-                <p class="text-emerald-600 font-extrabold text-xl mt-2">$${fruit.price} <span class="text-xs text-slate-400 font-normal">/ 斤</span></p>
-              </div>
-    
-              <!-- 數量調整按鈕 -->
-              <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
-                <span class="text-xs font-bold text-slate-500 pl-2">數量(斤)</span>
-                <div class="flex items-center space-x-2">
-                  <button onclick="updateCart('${fruit.id}', -1)" ${isSoldOut ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-white border shadow-sm font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed">-</button>
-                  <span id="qty-${fruit.id}" class="w-8 text-center font-bold text-sm">${cart[fruit.id] || 0}</span>
-                  <button onclick="updateCart('${fruit.id}', 1)" ${isSoldOut ? 'disabled' : ''} class="w-8 h-8 rounded-lg bg-white border shadow-sm font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed">+</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-    
-    // 💡 新增：點擊縮圖切換主圖的控制函式
-    function switchFruitImage(fruitId, targetImgUrl, clickedBtn) {
-      // 切換大圖 URL
-      const mainImg = document.getElementById(`main-img-${fruitId}`);
-      if (mainImg) {
-        mainImg.src = targetImgUrl;
-      }
-    
-      // 更新小圖外框高亮顏色
-      const allThumbs = document.querySelectorAll(`.thumb-btn-${fruitId}`);
-      allThumbs.forEach(btn => {
-        btn.classList.remove('border-emerald-500');
-        btn.classList.add('border-transparent');
-      });
-      if (clickedBtn) {
-        clickedBtn.classList.remove('border-transparent');
-        clickedBtn.classList.add('border-emerald-500');
-      }
-    }
-    // ------------------- 2. 購物車邏輯 -------------------
-    function updateCart(fruitId, delta) {
-      const fruit = fruitsData.find(f => f.id === fruitId);
-      if (!fruit) return;
-
-      const stock = fruit.stock !== undefined ? Number(fruit.stock) : 0;
-      const currentQty = cart[fruitId] || 0;
-      const newQty = currentQty + delta;
-
-      if (delta > 0 && newQty > stock) {
-        alert(`【${fruit.name}】目前剩餘庫存只有 ${stock} 斤喔！`);
-        return;
-      }
-
-      if (newQty <= 0) {
-        delete cart[fruitId];
-      } else {
-        cart[fruitId] = newQty;
-      }
-
-      const qtyElem = document.getElementById(`qty-${fruitId}`);
-      if (qtyElem) qtyElem.innerText = cart[fruitId] || 0;
-
-      renderCartUI();
-    }
-
-    function renderCartUI() {
-      // 1. 更新懸浮紅點數量
-      const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
-      const badge = document.getElementById('floating-cart-badge');
-      if (totalItems > 0) {
-        badge.innerText = totalItems;
-        badge.classList.remove('hidden');
-      } else {
-        badge.classList.add('hidden');
-      }
-
-      // 2. 渲染側邊欄清單
-      const container = document.getElementById('cart-drawer-items');
-      let totalAmount = 0;
-      const cartKeys = Object.keys(cart);
-
-      if (cartKeys.length === 0) {
-        container.innerHTML = `<div class="text-center text-slate-400 py-12">購物車內目前沒有商品喔！</div>`;
-        document.getElementById('cart-total-amount').innerText = '0';
-        return;
-      }
-
-      container.innerHTML = cartKeys.map(id => {
-        const fruit = fruitsData.find(f => f.id === id);
-        if (!fruit) return '';
-        const qty = cart[id];
-        const subtotal = fruit.price * qty;
-        totalAmount += subtotal;
-
-        return `
-          <div class="py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <div class="w-12 h-12 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden flex items-center justify-center">
-                ${fruit.imageUrl 
-                  ? `<img src="${fruit.imageUrl}" referrerpolicy="no-referrer" class="w-full h-full object-contain">`
-                  : `🍎`}
-              </div>
-              <div>
-                <p class="font-bold text-slate-800 text-sm">${fruit.name}</p>
-                <p class="text-xs text-slate-400">$${fruit.price} × ${qty} 斤</p>
-              </div>
-            </div>
-            <div class="flex items-center space-x-3">
-              <span class="font-bold text-emerald-600 text-sm">$${subtotal}</span>
-              <button onclick="updateCart('${id}', -${qty})" class="text-slate-300 hover:text-red-500 font-bold text-xs">移除</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      document.getElementById('cart-total-amount').innerText = totalAmount;
-    }
-
-    function toggleCartDrawer(show) {
-      const drawer = document.getElementById('cart-drawer');
-      if (show) drawer.classList.remove('hidden');
-      else drawer.classList.add('hidden');
-    }
-
-    // ------------------- 3. 送出訂單 -------------------
-    async function submitOrder() {
-      const keys = Object.keys(cart);
-      if (keys.length === 0) {
-        alert("購物車內還沒有任何商品喔！");
-        return;
-      }
-
-      const name = document.getElementById('order-name').value.trim();
-      const phone = document.getElementById('order-phone').value.trim();
-      const email = document.getElementById('order-email').value.trim();
-      const address = document.getElementById('order-address').value.trim();
-      const note = document.getElementById('order-note').value.trim();
-
-      if (!name || !phone || !address) {
-        alert("請完整填寫收件人姓名、電話與配送地址！");
-        return;
-      }
-
-      let itemsSummaryArray = [];
-      let totalAmount = 0;
-
-      keys.forEach(id => {
-        const fruit = fruitsData.find(f => f.id === id);
-        if (fruit) {
-          const qty = cart[id];
-          itemsSummaryArray.push(`${fruit.name} x ${qty}斤`);
-          totalAmount += fruit.price * qty;
-        }
-      });
-
-      const orderData = {
-        name: name,
-        phone: phone,
-        email: email,
-        address: address,
-        note: note,
-        items: itemsSummaryArray.join(", "),
+        name: document.getElementById("order-name").value.trim(),
+        phone: document.getElementById("order-phone").value.trim(),
+        email: document.getElementById("order-email").value.trim(),
+        address: document.getElementById("order-address").value.trim(),
+        note: document.getElementById("order-note").value.trim(),
+        items: summaryParts.join(", "),
         totalAmount: totalAmount
       };
 
-      const btn = document.getElementById('btn-submit-order');
-      btn.disabled = true;
-      btn.innerText = "提交訂單中...";
-
-      const res = await callGasApi("createOrder", orderData);
-
+      const res = await callGasApi("createOrder", payload);
       btn.disabled = false;
-      btn.innerText = "確認送出訂單";
+      btn.innerText = "✅ 確認送出訂單";
 
       if (res && res.status === "success") {
-        alert("🎉 " + (res.message || "訂單提交成功！") + "\n您的訂單編號為：" + res.orderId);
+        alert(`🎉 訂購成功！\n訂單編號：${res.orderId}\n總金額：$${totalAmount} 元\n\n請於 48 小時內完成匯款，農夫確認收款與出貨後將寄信通知您！`);
         cart = {};
-        renderCartUI();
-        renderShopFruits();
-        toggleCartDrawer(false);
+        updateCartUI();
+        closeCartModal();
       } else {
-        alert("訂單提交失敗：" + (res.message || "請稍後再試"));
+        alert("訂單建立失敗：" + (res ? res.message : "未知錯誤"));
       }
     }
 
-    // ------------------- 4. 會員系統控制 -------------------
-    function loadSavedUser() {
-      const saved = localStorage.getItem('ab_fruit_user');
+    // ------------------- 4. 會員系統與歷史訂單追蹤 -------------------
+
+    function restoreMemberSession() {
+      const saved = localStorage.getItem("fruit_member_user");
       if (saved) {
         try {
-          currentUser = JSON.parse(saved);
-          updateUserNavUI();
-          autoFillCheckoutForm();
-        } catch(e) {}
+          currentMember = JSON.parse(saved);
+          updateMemberHeader();
+        } catch (e) {}
       }
     }
 
-    function updateUserNavUI() {
-      const nameElem = document.getElementById('nav-user-name');
-      if (currentUser) {
-        nameElem.innerText = `你好，${currentUser.name}`;
+    function updateMemberHeader() {
+      const textEl = document.getElementById("nav-member-text");
+      if (currentMember) {
+        textEl.innerText = currentMember.name || currentMember.account;
       } else {
-        nameElem.innerText = "會員登入 / 註冊";
-      }
-    }
-
-    function autoFillCheckoutForm() {
-      if (currentUser) {
-        document.getElementById('order-name').value = currentUser.name || '';
-        document.getElementById('order-phone').value = currentUser.phone || '';
-        document.getElementById('order-email').value = currentUser.email || '';
-        document.getElementById('order-address').value = currentUser.address || '';
+        textEl.innerText = "會員登入";
       }
     }
 
     function openMemberModal() {
-      document.getElementById('member-modal').classList.remove('hidden');
-      if (currentUser) {
-        // 顯示個人中心與歷史訂單
-        document.getElementById('form-login').classList.add('hidden');
-        document.getElementById('form-register').classList.add('hidden');
-        document.getElementById('member-modal-tabs').classList.add('hidden');
-        
-        document.getElementById('member-profile-view').classList.remove('hidden');
-        document.getElementById('profile-user-name').innerText = currentUser.name;
-        document.getElementById('profile-user-phone').innerText = `📱 ${currentUser.phone}`;
-
-        fetchMemberOrders();
+      document.getElementById("member-modal").classList.remove("hidden");
+      if (currentMember) {
+        document.getElementById("member-guest-view").classList.add("hidden");
+        document.getElementById("member-logged-view").classList.remove("hidden");
+        document.getElementById("logged-member-info").innerText = `👋 您好，${currentMember.name}（${currentMember.account}）`;
+        document.getElementById("logged-member-sub").innerText = `手機：${currentMember.phone}｜Email：${currentMember.email}`;
+        loadMemberOrderHistory();
       } else {
-        // 顯示登入/註冊表單
-        document.getElementById('member-modal-tabs').classList.remove('hidden');
-        document.getElementById('member-profile-view').classList.add('hidden');
-        switchMemberTab('login');
+        document.getElementById("member-guest-view").classList.remove("hidden");
+        document.getElementById("member-logged-view").classList.add("hidden");
       }
     }
 
     function closeMemberModal() {
-      document.getElementById('member-modal').classList.add('hidden');
+      document.getElementById("member-modal").classList.add("hidden");
     }
 
-    function switchMemberTab(tab) {
-      if (tab === 'login') {
-        document.getElementById('form-login').classList.remove('hidden');
-        document.getElementById('form-register').classList.add('hidden');
-        document.getElementById('tab-btn-login').className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white";
-        document.getElementById('tab-btn-register').className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600";
-      } else {
-        document.getElementById('form-login').classList.add('hidden');
-        document.getElementById('form-register').classList.remove('hidden');
-        document.getElementById('tab-btn-login').className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-slate-200 text-slate-600";
-        document.getElementById('tab-btn-register').className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white";
-      }
-    }
-
-    // 處理會員登入
-    async function handleLogin(e) {
-      e.preventDefault();
-      const phone = document.getElementById('login-phone').value.trim();
-      const pass = document.getElementById('login-password').value.trim();
-
-      const btn = document.getElementById('btn-login-submit');
-      btn.disabled = true;
-      btn.innerText = "驗證中...";
-
-      const res = await callGasApi("login", { phone: phone, password: pass });
-
-      btn.disabled = false;
-      btn.innerText = "登入會員";
-
-      if (res && res.status === 'success') {
-        currentUser = res.user;
-        localStorage.setItem('ab_fruit_user', JSON.stringify(currentUser));
-        updateUserNavUI();
-        autoFillCheckoutForm();
-        alert("登入成功！");
-        openMemberModal(); // 切換為會員中心 view
-      } else {
-        alert(res.message || "登入失敗，請驗證帳號密碼！");
-      }
-    }
-
-    // 處理會員註冊
-    async function handleRegister(e) {
-      e.preventDefault();
-      const name = document.getElementById('reg-name').value.trim();
-      const phone = document.getElementById('reg-phone').value.trim();
-      const pass = document.getElementById('reg-password').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      const address = document.getElementById('reg-address').value.trim();
-
-      const btn = document.getElementById('btn-register-submit');
-      btn.disabled = true;
-      btn.innerText = "註冊資料提交中...";
-
-      const res = await callGasApi("register", {
-        name: name,
-        phone: phone,
-        password: pass,
-        email: email,
-        address: address
+    function switchMemberAuthTab(tab) {
+      ["login", "register", "forgot"].forEach(t => {
+        document.getElementById(`member-${t}-form`).classList.toggle("hidden", t !== tab);
+        document.getElementById(`auth-tab-${t}`).className = t === tab
+          ? "py-2 rounded-lg bg-white text-emerald-700 shadow-xs"
+          : "py-2 rounded-lg text-slate-500";
       });
+    }
 
-      btn.disabled = false;
-      btn.innerText = "完成註冊";
+    async function handleMemberLogin(e) {
+      e.preventDefault();
+      const key = document.getElementById("m-login-key").value.trim();
+      const pass = document.getElementById("m-login-pass").value.trim();
 
-      if (res && res.status === 'success') {
-        alert("🎉 註冊成功！請直接登入");
-        switchMemberTab('login');
-        document.getElementById('login-phone').value = phone;
+      const res = await callGasApi("login", { account: key, password: pass });
+      if (res && res.status === "success") {
+        currentMember = res.user;
+        localStorage.setItem("fruit_member_user", JSON.stringify(currentMember));
+        updateMemberHeader();
+        openMemberModal();
       } else {
-        alert(res.message || "註冊失敗！");
+        alert(res ? res.message : "登入失敗");
       }
     }
 
-    // 處理會員登出
-    function handleLogout() {
-      currentUser = null;
-      localStorage.removeItem('ab_fruit_user');
-      updateUserNavUI();
-      closeMemberModal();
-      alert("已成功登出");
+    async function handleMemberRegister(e) {
+      e.preventDefault();
+      const payload = {
+        account: document.getElementById("m-reg-acc").value.trim(),
+        password: document.getElementById("m-reg-pass").value.trim(),
+        name: document.getElementById("m-reg-name").value.trim(),
+        phone: document.getElementById("m-reg-phone").value.trim(),
+        email: document.getElementById("m-reg-email").value.trim(),
+        address: document.getElementById("m-reg-addr").value.trim()
+      };
+
+      const res = await callGasApi("register", payload);
+      if (res && res.status === "success") {
+        alert("註冊成功！請使用剛設定的帳號密碼登入。");
+        switchMemberAuthTab("login");
+      } else {
+        alert(res ? res.message : "註冊失敗");
+      }
     }
 
-    // 取得歷史訂單
-    async function fetchMemberOrders() {
-      const container = document.getElementById('member-orders-list');
-      container.innerHTML = `<div class="text-xs text-slate-400 text-center py-6">正在載入個人訂單...</div>`;
+    async function handleMemberForgot(e) {
+      e.preventDefault();
+      const payload = {
+        account: document.getElementById("m-fg-acc").value.trim(),
+        phone: document.getElementById("m-fg-phone").value.trim(),
+        email: document.getElementById("m-fg-email").value.trim()
+      };
 
-      const res = await callGasApi("getMemberOrders", { phone: currentUser.phone });
+      const res = await callGasApi("forgotPassword", payload);
+      if (res && res.status === "success") {
+        alert(`✅ 身分驗證通過！您的密碼為：${res.password}`);
+        switchMemberAuthTab("login");
+      } else {
+        alert(res ? res.message : "驗證失敗");
+      }
+    }
 
-      if (res && res.status === 'success') {
+    function handleMemberLogout() {
+      currentMember = null;
+      localStorage.removeItem("fruit_member_user");
+      updateMemberHeader();
+      openMemberModal();
+    }
+
+    async function loadMemberOrderHistory() {
+      if (!currentMember) return;
+      const listEl = document.getElementById("member-orders-list");
+      listEl.innerHTML = `<div class="text-center py-6 text-xs text-slate-400">讀取歷史訂單中...</div>`;
+
+      const res = await callGasApi("getMemberOrders", { phone: currentMember.phone });
+      if (res && res.status === "success") {
         const orders = res.data || [];
         if (orders.length === 0) {
-          container.innerHTML = `<div class="text-xs text-slate-400 text-center py-6">您目前還沒有任何訂單紀錄喔！</div>`;
+          listEl.innerHTML = `<div class="text-center py-6 text-xs text-slate-400 bg-slate-50 rounded-xl">尚無歷史訂單紀錄</div>`;
           return;
         }
 
-        container.innerHTML = orders.map(ord => `
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
-            <div class="flex justify-between items-center font-bold">
-              <span class="text-slate-700">${ord.orderId}</span>
-              <span class="px-2 py-0.5 rounded-full text-[10px] ${ord.status === '已完成' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${ord.status || '處理中'}</span>
+        listEl.innerHTML = orders.map(o => `
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-1.5">
+            <div class="flex justify-between items-center border-b pb-1.5">
+              <span class="font-bold text-emerald-700">${o.orderId}</span>
+              <span class="px-2 py-0.5 rounded bg-white border font-bold text-slate-700">${o.status}</span>
             </div>
-            <p class="text-slate-500">${ord.items}</p>
-            <div class="flex justify-between items-center text-slate-400 pt-1">
-              <span>${ord.time}</span>
-              <span class="font-extrabold text-slate-700">$${ord.totalAmount} 元</span>
+            <div class="text-slate-600">📦 ${o.items}</div>
+            <div class="flex justify-between items-center text-slate-500">
+              <span>💰 付款狀態：<b class="${o.paymentStatus === '已收款' ? 'text-emerald-600' : 'text-amber-600'}">${o.paymentStatus}</b></span>
+              <span class="font-bold text-slate-800">$${o.totalAmount} 元</span>
             </div>
+            ${o.trackingNumber ? `
+              <div class="bg-blue-50 text-blue-800 border border-blue-200 px-2.5 py-1.5 rounded-lg font-bold">
+                🚚 物流單號：${o.trackingNumber}
+              </div>
+            ` : ''}
           </div>
         `).join('');
-      } else {
-        container.innerHTML = `<div class="text-xs text-red-400 text-center py-6">無法讀取歷史訂單</div>`;
       }
     }
   </script>
 </body>
 </html>
-</template>
