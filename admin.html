@@ -6,18 +6,18 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>阿咘奶粉錢後台管理系統 (手機優化版)</title>
+  <title>阿咘奶粉錢後台管理系統 (精簡高效版)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen font-sans text-slate-800">
+<body class="bg-slate-100 min-h-screen font-sans text-slate-800 pb-24">
 
   <!-- 頂部導覽列 -->
   <header class="bg-slate-800 text-white shadow-md sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center space-x-2">
         <span class="text-2xl">👨‍🌾</span>
         <h1 class="text-base sm:text-lg font-bold">阿咘奶粉錢 - 後台</h1>
@@ -66,20 +66,60 @@
       </div>
 
       <!-- A. 水果商品與現況輪播管理 -->
-      <div id="panel-fruits" class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
-          <div>
-            <h3 class="text-lg font-bold text-slate-800">水果商品與現況輪播</h3>
-            <p class="text-xs text-slate-500">勾選「📺 輪播中」的照片會自動登上首頁頂部現況大看板</p>
+      <div id="panel-fruits" class="space-y-4">
+
+        <!-- A-1. 首頁現況輪播總管（集中一眼管理所有輪播照片與順序） -->
+        <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-emerald-200 space-y-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-base font-bold text-emerald-900 flex items-center gap-1.5">
+                <span>📺 首頁現況輪播總覽</span>
+                <span id="carousel-total-badge" class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">0 張</span>
+              </h3>
+              <p class="text-[11px] text-slate-500 mt-0.5">這裡集中顯示所有已勾選「輪播中」的照片，可直接調整播放順序或修改標籤</p>
+            </div>
+            <button type="button" onclick="toggleCarouselOverview()" id="btn-toggle-carousel-box" class="text-xs text-slate-500 hover:text-slate-800 font-bold px-2.5 py-1 rounded-lg bg-slate-100">
+              收合 ▴
+            </button>
           </div>
-          <div class="flex space-x-2 w-full sm:w-auto">
-            <button onclick="addNewFruitRow()" class="flex-1 sm:flex-none px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold border">+ 新增水果</button>
-            <button onclick="saveFruitsToBackend()" id="btn-save-fruits" class="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm">💾 儲存更新</button>
+
+          <div id="carousel-overview-body">
+            <div id="carousel-overview-list" class="flex items-stretch gap-3 overflow-x-auto pb-2 pt-1">
+              <!-- JS 動態生成目前所有輪播照片 -->
+            </div>
           </div>
         </div>
 
-        <div id="admin-fruit-container" class="space-y-4">
-          <div class="text-center py-8 text-slate-400">正在載入水果資料...</div>
+        <!-- A-2. 水果清單與快速篩選區 -->
+        <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 border-b pb-3">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-slate-800">水果商品清單（點擊列可展開編輯）</h3>
+            </div>
+            <div class="flex flex-wrap gap-1.5 w-full sm:w-auto">
+              <button type="button" onclick="expandAllFruits(true)" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold">全部展開</button>
+              <button type="button" onclick="expandAllFruits(false)" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold">全部收合</button>
+              <button type="button" onclick="addNewFruitRow()" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold">+ 新增水果</button>
+              <button type="button" onclick="saveFruitsToBackend()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm">💾 儲存更新</button>
+            </div>
+          </div>
+
+          <!-- 搜尋框與快速篩選標籤 -->
+          <div class="space-y-2">
+            <div class="relative">
+              <input type="text" id="fruit-search-input" oninput="renderAdminFruits()" placeholder="🔍 搜尋水果名稱，快速找到要修改的品項..." class="w-full pl-3 pr-8 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 focus:bg-white">
+              <button type="button" onclick="document.getElementById('fruit-search-input').value=''; renderAdminFruits();" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold">✕</button>
+            </div>
+
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar" id="fruit-filter-bar">
+              <!-- JS 動態生成篩選膠囊 -->
+            </div>
+          </div>
+
+          <!-- 折疊式水果卡片容器 -->
+          <div id="admin-fruit-container" class="space-y-2.5 pt-1">
+            <div class="text-center py-8 text-slate-400">正在載入水果資料...</div>
+          </div>
         </div>
       </div>
 
@@ -101,10 +141,28 @@
 
   </main>
 
+  <!-- 底部懸浮未儲存變更提醒列 -->
+  <div id="unsaved-float-bar" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-sm text-white p-3 shadow-2xl z-50 border-t border-slate-700">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 text-xs sm:text-sm">
+        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+        <span class="font-bold text-amber-300">您有尚未儲存的變更（照片、輪播或價格庫存）</span>
+      </div>
+      <button type="button" onclick="saveFruitsToBackend()" id="btn-float-save" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-bold px-5 py-2 rounded-xl text-xs sm:text-sm shadow-lg whitespace-nowrap transition">
+        💾 立即儲存更新
+      </button>
+    </div>
+  </div>
+
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxQsDLOyagMbYOOw-uYBozoZXRRq5fmEutsZCn0Q3DjtNjq9Uf10PQ7zMsXETsy0UKf/exec";
 
     let fruitsData = [];
+    let expandedFruitIds = new Set(); // 記錄目前展開編輯的水果 ID
+    let currentFruitFilter = 'ALL'; // ALL | ON | OFF | CAROUSEL | LOW_STOCK
+    let isCarouselBoxOpen = true;
+    let hasUnsavedChanges = false;
+
     let rawOrdersData = [];
     let currentOrderFilter = 'ALL';
     let draggedImgInfo = null;
@@ -112,6 +170,16 @@
     window.onload = function() {
       checkAuthStatus();
     };
+
+    function markUnsaved() {
+      hasUnsavedChanges = true;
+      document.getElementById('unsaved-float-bar').classList.remove('hidden');
+    }
+
+    function clearUnsaved() {
+      hasUnsavedChanges = false;
+      document.getElementById('unsaved-float-bar').classList.add('hidden');
+    }
 
     function getTodayTag() {
       const now = new Date();
@@ -181,7 +249,8 @@
       document.getElementById('tab-btn-orders').className = tab === 'orders' ? "py-2.5 text-center rounded-lg font-bold text-sm bg-emerald-600 text-white shadow-sm transition" : "py-2.5 text-center rounded-lg font-bold text-sm text-slate-600 hover:bg-slate-100 transition";
     }
 
-    // 確保每款水果的 carouselItems 與 imageUrl 保持同步
+    // ------------------- 1. 輪播與水果資料同步 -------------------
+
     function normalizeFruitCarousel(fruit) {
       const urls = (fruit.imageUrl || "").split(/[\n,]+/).map(u => u.trim()).filter(Boolean);
       const existingItems = Array.isArray(fruit.carouselItems) ? fruit.carouselItems : [];
@@ -191,10 +260,44 @@
         return {
           url: u,
           carousel: match ? Boolean(match.carousel) : false,
-          caption: match && match.caption ? match.caption : ""
+          caption: match && match.caption ? match.caption : "",
+          order: match && match.order !== undefined ? Number(match.order) : 999
         };
       });
       fruit.imageUrl = urls.join(',');
+    }
+
+    // 取得目前所有已勾選「輪播中」的照片（依 order 排序）
+    function getAllActiveCarouselSlides() {
+      const list = [];
+      fruitsData.forEach(fruit => {
+        normalizeFruitCarousel(fruit);
+        fruit.carouselItems.forEach((item, imgIdx) => {
+          if (item.carousel) {
+            list.push({
+              fruitId: fruit.id,
+              fruitName: fruit.name,
+              fruitStatus: fruit.status,
+              imgIdx: imgIdx,
+              url: item.url,
+              caption: item.caption || "",
+              order: item.order !== undefined ? Number(item.order) : 999
+            });
+          }
+        });
+      });
+      list.sort((a, b) => a.order - b.order);
+      return list;
+    }
+
+    // 重新編號全域輪播順序 (1, 2, 3...)
+    function syncGlobalCarouselOrder(orderedSlides) {
+      orderedSlides.forEach((slide, idx) => {
+        const fruit = fruitsData.find(f => f.id === slide.fruitId);
+        if (fruit && fruit.carouselItems[slide.imgIdx]) {
+          fruit.carouselItems[slide.imgIdx].order = idx + 1;
+        }
+      });
     }
 
     async function loadFruits() {
@@ -204,82 +307,243 @@
           normalizeFruitCarousel(f);
           return f;
         });
-        renderAdminFruits();
+        clearUnsaved();
+        renderAllFruitUI();
       }
     }
 
-    // 💡 渲染照片縮圖（含：封面標示 / 設為封面 / 輪播中切換 / 拖曳對調 / 刪除）
-    function renderThumbnails(fruit, fruitIdx) {
+    function renderAllFruitUI() {
+      renderCarouselOverview();
+      renderFruitFilterBar();
+      renderAdminFruits();
+    }
+
+    // ------------------- 2. 頂部「首頁現況輪播總覽」 -------------------
+
+    function toggleCarouselOverview() {
+      isCarouselBoxOpen = !isCarouselBoxOpen;
+      document.getElementById('carousel-overview-body').classList.toggle('hidden', !isCarouselBoxOpen);
+      document.getElementById('btn-toggle-carousel-box').innerText = isCarouselBoxOpen ? '收合 ▴' : '展開 ▾';
+    }
+
+    function renderCarouselOverview() {
+      const slides = getAllActiveCarouselSlides();
+      document.getElementById('carousel-total-badge').innerText = `${slides.length} 張輪播中`;
+
+      const listEl = document.getElementById('carousel-overview-list');
+      if (slides.length === 0) {
+        listEl.innerHTML = `
+          <div class="w-full py-5 px-4 bg-slate-50 border border-dashed border-slate-300 rounded-xl text-center text-xs text-slate-500">
+            目前尚未勾選任何首頁輪播照片。請在下方點開任意水果，點擊照片下方的「⬜ 加入輪播」即可！
+          </div>`;
+        return;
+      }
+
+      listEl.innerHTML = slides.map((s, idx) => `
+        <div class="w-44 flex-shrink-0 bg-slate-50 border border-emerald-200 rounded-xl p-2 space-y-1.5 shadow-xs relative">
+          <div class="relative">
+            <img src="${s.url}" referrerpolicy="no-referrer" class="w-full h-24 object-cover rounded-lg bg-slate-200">
+            <span class="absolute top-1 left-1 bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow">
+              第 ${idx + 1} 張
+            </span>
+            <button type="button" onclick="removeFromCarouselGlobal('${s.fruitId}', ${s.imgIdx})" title="移出輪播" class="absolute -top-1.5 -right-1.5 bg-slate-800 hover:bg-red-600 text-white w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center shadow">
+              ✕
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-700 truncate">
+            <span class="truncate">🍎 ${s.fruitName}</span>
+            ${s.fruitStatus === 'OFF' ? '<span class="text-[9px] text-red-600 bg-red-50 px-1 rounded">已下架</span>' : ''}
+          </div>
+
+          <input type="text" 
+                 value="${s.caption}" 
+                 onchange="updateCarouselCaption('${s.fruitId}', ${s.imgIdx}, this.value)"
+                 placeholder="輸入標籤如 ${getTodayTag()}"
+                 class="w-full text-[11px] px-2 py-1 border border-slate-300 rounded-md bg-white focus:ring-1 focus:ring-emerald-500 outline-none">
+
+          <!-- 調整首頁輪播播放順序 -->
+          <div class="grid grid-cols-2 gap-1 pt-0.5">
+            <button type="button" ${idx === 0 ? 'disabled' : ''} onclick="moveCarouselSlide(${idx}, -1)" class="py-1 text-[10px] font-bold rounded bg-white border border-slate-200 hover:bg-slate-100 disabled:opacity-30">
+              ◀ 往前
+            </button>
+            <button type="button" ${idx === slides.length - 1 ? 'disabled' : ''} onclick="moveCarouselSlide(${idx}, 1)" class="py-1 text-[10px] font-bold rounded bg-white border border-slate-200 hover:bg-slate-100 disabled:opacity-30">
+              往後 ▶
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function moveCarouselSlide(slideIdx, delta) {
+      const slides = getAllActiveCarouselSlides();
+      const targetIdx = slideIdx + delta;
+      if (targetIdx < 0 || targetIdx >= slides.length) return;
+
+      const temp = slides[slideIdx];
+      slides[slideIdx] = slides[targetIdx];
+      slides[targetIdx] = temp;
+
+      syncGlobalCarouselOrder(slides);
+      markUnsaved();
+      renderAllFruitUI();
+    }
+
+    function removeFromCarouselGlobal(fruitId, imgIdx) {
+      const fruit = fruitsData.find(f => f.id === fruitId);
+      if (!fruit || !fruit.carouselItems[imgIdx]) return;
+      fruit.carouselItems[imgIdx].carousel = false;
+      markUnsaved();
+      renderAllFruitUI();
+    }
+
+    // ------------------- 3. 水果篩選與展開/收合控制 -------------------
+
+    function setFruitFilter(filterKey) {
+      currentFruitFilter = filterKey;
+      renderFruitFilterBar();
+      renderAdminFruits();
+    }
+
+    function renderFruitFilterBar() {
+      const filters = [
+        { key: 'ALL', label: '全部水果', count: fruitsData.length },
+        { key: 'ON', label: '🟢 上架中', count: fruitsData.filter(f => f.status === 'ON').length },
+        { key: 'OFF', label: '🔴 已下架', count: fruitsData.filter(f => f.status === 'OFF').length },
+        { key: 'CAROUSEL', label: '📺 有設輪播', count: fruitsData.filter(f => (f.carouselItems || []).some(c => c.carousel)).length },
+        { key: 'LOW_STOCK', label: '⚠️ 低庫存(≤10)', count: fruitsData.filter(f => Number(f.stock) <= 10).length }
+      ];
+
+      document.getElementById('fruit-filter-bar').innerHTML = filters.map(flt => {
+        const active = currentFruitFilter === flt.key;
+        return `
+          <button type="button" onclick="setFruitFilter('${flt.key}')" class="px-2.5 py-1 rounded-lg text-xs whitespace-nowrap transition flex items-center gap-1 flex-shrink-0 ${
+            active ? 'bg-slate-800 text-white font-bold shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }">
+            <span>${flt.label}</span>
+            <span class="text-[10px] px-1.5 rounded-full font-bold ${active ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-700'}">${flt.count}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleFruitExpand(fruitId) {
+      if (expandedFruitIds.has(fruitId)) {
+        expandedFruitIds.delete(fruitId);
+      } else {
+        expandedFruitIds.add(fruitId);
+      }
+      renderAdminFruits();
+    }
+
+    function expandAllFruits(expand) {
+      if (expand) {
+        fruitsData.forEach(f => expandedFruitIds.add(f.id));
+      } else {
+        expandedFruitIds.clear();
+      }
+      renderAdminFruits();
+    }
+
+    // ------------------- 4. 單一水果照片縮圖管理（多圖順序 / 設為封面 / 勾選輪播） -------------------
+
+    function renderThumbnails(fruit) {
       normalizeFruitCarousel(fruit);
       const items = fruit.carouselItems;
 
       if (items.length === 0) {
-        return `<div class="w-20 h-20 rounded-xl bg-slate-200 border flex items-center justify-center text-slate-400 text-xs font-bold flex-shrink-0">無圖片</div>`;
+        return `<div class="w-20 h-20 rounded-xl bg-slate-200 border flex items-center justify-center text-slate-400 text-xs font-bold flex-shrink-0">尚無照片</div>`;
       }
 
       return items.map((item, imgIdx) => `
-        <div class="relative flex-shrink-0 w-24 bg-white rounded-xl border ${item.carousel ? 'border-emerald-500 ring-2 ring-emerald-200' : 'border-slate-200'} p-1 shadow-sm">
+        <div class="relative flex-shrink-0 w-24 bg-white rounded-xl border ${item.carousel ? 'border-emerald-500 ring-2 ring-emerald-200' : 'border-slate-200'} p-1 shadow-xs">
           <div class="relative">
             <img src="${item.url}" 
                  referrerpolicy="no-referrer" 
                  draggable="true"
-                 ondragstart="handleDragStart(event, ${fruitIdx}, ${imgIdx})"
+                 ondragstart="handleDragStart(event, '${fruit.id}', ${imgIdx})"
                  ondragover="handleDragOver(event)"
-                 ondrop="handleDrop(event, ${fruitIdx}, ${imgIdx})"
-                 class="w-full h-20 object-cover rounded-lg bg-slate-200 cursor-grab active:cursor-grabbing transition" 
-                 title="按住拖曳可調整順序">
+                 ondrop="handleDrop(event, '${fruit.id}', ${imgIdx})"
+                 class="w-full h-20 object-cover rounded-lg bg-slate-200 cursor-grab active:cursor-grabbing">
 
             ${imgIdx === 0 ? `
-              <span class="absolute top-1 left-1 bg-slate-900/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">封面圖</span>
+              <span class="absolute top-1 left-1 bg-slate-900/85 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">封面圖</span>
             ` : `
-              <button type="button" 
-                      onclick="setAsCover(${fruitIdx}, ${imgIdx})" 
-                      class="absolute top-1 left-1 bg-slate-800/75 hover:bg-slate-900 text-white text-[9px] font-bold px-1.5 py-0.5 rounded transition">
+              <button type="button" onclick="setAsCover('${fruit.id}', ${imgIdx})" class="absolute top-1 left-1 bg-slate-800/75 hover:bg-slate-900 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
                 設為封面
               </button>
             `}
 
-            <button type="button" 
-                    onclick="deleteSingleImage(${fruitIdx}, ${imgIdx})" 
-                    class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 text-[11px] font-bold flex items-center justify-center shadow-md transition" 
-                    title="刪除此圖片">✕</button>
+            <button type="button" onclick="deleteSingleImage('${fruit.id}', ${imgIdx})" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 text-[11px] font-bold flex items-center justify-center shadow" title="刪除此圖片">✕</button>
           </div>
 
-          <!-- 一鍵勾選是否上首頁輪播 -->
+          <!-- 手機友善左右移位按鈕 -->
+          <div class="grid grid-cols-2 gap-1 mt-1">
+            <button type="button" ${imgIdx === 0 ? 'disabled' : ''} onclick="moveFruitPhoto('${fruit.id}', ${imgIdx}, -1)" class="py-0.5 text-[10px] font-bold rounded bg-slate-100 hover:bg-slate-200 text-slate-600 disabled:opacity-30">◀</button>
+            <button type="button" ${imgIdx === items.length - 1 ? 'disabled' : ''} onclick="moveFruitPhoto('${fruit.id}', ${imgIdx}, 1)" class="py-0.5 text-[10px] font-bold rounded bg-slate-100 hover:bg-slate-200 text-slate-600 disabled:opacity-30">▶</button>
+          </div>
+
+          <!-- 一鍵切換是否加入首頁輪播 -->
           <button type="button"
-                  onclick="toggleCarousel(${fruitIdx}, ${imgIdx})"
-                  class="mt-1 w-full py-1 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1 ${
+                  onclick="toggleCarousel('${fruit.id}', ${imgIdx})"
+                  class="mt-1 w-full py-1 rounded-lg text-[10px] font-bold transition ${
                     item.carousel 
-                      ? 'bg-emerald-600 text-white shadow-sm' 
+                      ? 'bg-emerald-600 text-white shadow-xs' 
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
                   }">
-            <span>${item.carousel ? '📺 輪播中' : '⬜ 加入輪播'}</span>
+            ${item.carousel ? '📺 輪播中' : '⬜ 加入輪播'}
           </button>
         </div>
       `).join('');
     }
 
-    // 切換該張照片是否加入首頁輪播
-    function toggleCarousel(fruitIdx, imgIdx) {
-      normalizeFruitCarousel(fruitsData[fruitIdx]);
-      const target = fruitsData[fruitIdx].carouselItems[imgIdx];
+    function toggleCarousel(fruitId, imgIdx) {
+      const fruit = fruitsData.find(f => f.id === fruitId);
+      if (!fruit) return;
+      normalizeFruitCarousel(fruit);
+
+      const target = fruit.carouselItems[imgIdx];
       if (!target) return;
 
       target.carousel = !target.carousel;
-      if (target.carousel && !target.caption) {
-        target.caption = getTodayTag();
+      if (target.carousel) {
+        if (!target.caption) target.caption = getTodayTag();
+        const currentMax = getAllActiveCarouselSlides().reduce((max, s) => Math.max(max, s.order === 999 ? 0 : s.order), 0);
+        target.order = currentMax + 1;
       }
-      renderAdminFruits();
+      markUnsaved();
+      renderAllFruitUI();
     }
 
-    function updateCarouselCaption(fruitIdx, imgIdx, newCaption) {
-      if (fruitsData[fruitIdx] && fruitsData[fruitIdx].carouselItems[imgIdx]) {
-        fruitsData[fruitIdx].carouselItems[imgIdx].caption = newCaption;
+    function updateCarouselCaption(fruitId, imgIdx, newCaption) {
+      const fruit = fruitsData.find(f => f.id === fruitId);
+      if (fruit && fruit.carouselItems[imgIdx]) {
+        fruit.carouselItems[imgIdx].caption = newCaption;
+        markUnsaved();
+        renderAllFruitUI();
       }
     }
 
-    function handleDragStart(e, fruitIdx, imgIdx) {
-      draggedImgInfo = { fruitIdx, imgIdx };
+    function moveFruitPhoto(fruitId, imgIdx, delta) {
+      const fruit = fruitsData.find(f => f.id === fruitId);
+      if (!fruit) return;
+      normalizeFruitCarousel(fruit);
+
+      const items = fruit.carouselItems;
+      const targetIdx = imgIdx + delta;
+      if (targetIdx < 0 || targetIdx >= items.length) return;
+
+      const temp = items[imgIdx];
+      items[imgIdx] = items[targetIdx];
+      items[targetIdx] = temp;
+
+      fruit.imageUrl = items.map(i => i.url).join(',');
+      markUnsaved();
+      renderAllFruitUI();
+    }
+
+    function handleDragStart(e, fruitId, imgIdx) {
+      draggedImgInfo = { fruitId, imgIdx };
       e.dataTransfer.effectAllowed = 'move';
     }
 
@@ -288,150 +552,196 @@
       e.dataTransfer.dropEffect = 'move';
     }
 
-    function handleDrop(e, targetFruitIdx, targetImgIdx) {
+    function handleDrop(e, targetFruitId, targetImgIdx) {
       e.preventDefault();
       if (!draggedImgInfo) return;
+      const { fruitId, imgIdx } = draggedImgInfo;
+      if (fruitId !== targetFruitId || imgIdx === targetImgIdx) return;
 
-      const { fruitIdx, imgIdx } = draggedImgInfo;
-      if (fruitIdx !== targetFruitIdx || imgIdx === targetImgIdx) return;
+      const fruit = fruitsData.find(f => f.id === fruitId);
+      if (!fruit) return;
+      normalizeFruitCarousel(fruit);
 
-      normalizeFruitCarousel(fruitsData[fruitIdx]);
-      const items = fruitsData[fruitIdx].carouselItems;
-
+      const items = fruit.carouselItems;
       const temp = items[imgIdx];
       items[imgIdx] = items[targetImgIdx];
       items[targetImgIdx] = temp;
 
-      fruitsData[fruitIdx].imageUrl = items.map(i => i.url).join(',');
-      renderAdminFruits();
+      fruit.imageUrl = items.map(i => i.url).join(',');
+      markUnsaved();
+      renderAllFruitUI();
     }
 
-    function setAsCover(fruitIdx, imgIdx) {
-      normalizeFruitCarousel(fruitsData[fruitIdx]);
-      const items = fruitsData[fruitIdx].carouselItems;
+    function setAsCover(fruitId, imgIdx) {
+      const fruit = fruitsData.find(f => f.id === fruitId);
+      if (!fruit) return;
+      normalizeFruitCarousel(fruit);
+
+      const items = fruit.carouselItems;
       if (imgIdx === 0 || imgIdx >= items.length) return;
 
       const targetItem = items.splice(imgIdx, 1)[0];
       items.unshift(targetItem);
 
-      fruitsData[fruitIdx].imageUrl = items.map(i => i.url).join(',');
-      renderAdminFruits();
+      fruit.imageUrl = items.map(i => i.url).join(',');
+      markUnsaved();
+      renderAllFruitUI();
     }
 
-    function deleteSingleImage(fruitIdx, imgIdx) {
-      normalizeFruitCarousel(fruitsData[fruitIdx]);
-      const items = fruitsData[fruitIdx].carouselItems;
-      items.splice(imgIdx, 1);
+    function deleteSingleImage(fruitId, imgIdx) {
+      const fruit = fruitsData.find(f => f.id === fruitId);
+      if (!fruit) return;
+      normalizeFruitCarousel(fruit);
 
-      fruitsData[fruitIdx].imageUrl = items.map(i => i.url).join(',');
-      renderAdminFruits();
+      fruit.carouselItems.splice(imgIdx, 1);
+      fruit.imageUrl = fruit.carouselItems.map(i => i.url).join(',');
+      markUnsaved();
+      renderAllFruitUI();
     }
 
-    function handleManualUrlChange(fruitIdx, newUrlStr) {
-      fruitsData[fruitIdx].imageUrl = newUrlStr;
-      normalizeFruitCarousel(fruitsData[fruitIdx]);
-      renderAdminFruits();
+    function updateFruitField(fruitId, field, value) {
+      const fruit = fruitsData.find(f => f.id === fruitId);
+      if (!fruit) return;
+      fruit[field] = value;
+      if (field === 'imageUrl') normalizeFruitCarousel(fruit);
+      markUnsaved();
+      renderAllFruitUI();
     }
+
+    // ------------------- 5. 渲染折疊式水果清單 -------------------
 
     function renderAdminFruits() {
       const container = document.getElementById('admin-fruit-container');
-      if (fruitsData.length === 0) {
-        container.innerHTML = `<div class="text-center py-8 text-slate-400">目前尚無水果資料</div>`;
+      const keyword = (document.getElementById('fruit-search-input')?.value || "").trim().toLowerCase();
+
+      const filtered = fruitsData.filter(f => {
+        const matchKeyword = !keyword || (f.name && f.name.toLowerCase().includes(keyword)) || (f.description && f.description.toLowerCase().includes(keyword));
+        if (!matchKeyword) return false;
+
+        if (currentFruitFilter === 'ON') return f.status === 'ON';
+        if (currentFruitFilter === 'OFF') return f.status === 'OFF';
+        if (currentFruitFilter === 'CAROUSEL') return (f.carouselItems || []).some(c => c.carousel);
+        if (currentFruitFilter === 'LOW_STOCK') return Number(f.stock) <= 10;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-10 text-xs text-slate-400 bg-slate-50 rounded-xl border border-dashed">找不到符合條件的水果品項</div>`;
         return;
       }
 
-      container.innerHTML = fruitsData.map((f, idx) => {
+      container.innerHTML = filtered.map(f => {
         normalizeFruitCarousel(f);
-        const activeCarouselItems = f.carouselItems
-          .map((item, imgIdx) => ({ ...item, imgIdx }))
-          .filter(item => item.carousel);
+        const isExpanded = expandedFruitIds.has(f.id);
+        const photoCount = f.carouselItems.length;
+        const carouselCount = f.carouselItems.filter(c => c.carousel).length;
+        const coverUrl = photoCount > 0 ? f.carouselItems[0].url : "";
+        const isLowStock = Number(f.stock) <= 10;
 
         return `
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 relative shadow-sm" data-id="${f.id}">
+        <div class="border rounded-2xl overflow-hidden transition ${isExpanded ? 'border-emerald-400 bg-white shadow-md' : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80'}">
           
-          <!-- 圖片預覽列 -->
-          <div class="space-y-2">
-            <div class="flex items-start gap-2.5 overflow-x-auto pb-1.5 pt-1" id="img-preview-box-${idx}">
-              ${renderThumbnails(f, idx)}
-            </div>
-            <p class="text-[11px] text-slate-400 font-bold">💡 提示：點擊照片下方「加入輪播」可登上首頁看板；按住照片可拖曳排序</p>
+          <!-- 精簡一行摘要列（永遠顯示，點擊可展開/收合） -->
+          <div onclick="toggleFruitExpand('${f.id}')" class="p-3 flex items-center justify-between gap-2.5 cursor-pointer select-none">
+            <div class="flex items-center gap-2.5 min-w-0">
+              ${coverUrl ? `
+                <img src="${coverUrl}" referrerpolicy="no-referrer" class="w-12 h-12 rounded-xl object-cover bg-slate-200 border flex-shrink-0">
+              ` : `
+                <div class="w-12 h-12 rounded-xl bg-slate-200 border flex items-center justify-center text-[10px] text-slate-400 font-bold flex-shrink-0">無圖</div>
+              `}
 
-            <!-- 已勾選輪播的照片圖說設定區 -->
-            ${activeCarouselItems.length > 0 ? `
-              <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-2.5 space-y-2">
-                <div class="text-xs font-bold text-emerald-800 flex items-center gap-1">
-                  <span>📺 首頁輪播現況標籤設定（共 ${activeCarouselItems.length} 張輪播中）</span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-slate-800 text-sm sm:text-base truncate">${f.name || '未命名水果'}</span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0 ${f.status === 'ON' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">
+                    ${f.status === 'ON' ? '上架' : '下架'}
+                  </span>
                 </div>
-                ${activeCarouselItems.map(cItem => `
-                  <div class="flex items-center gap-2 bg-white p-1.5 rounded-lg border border-emerald-100">
-                    <img src="${cItem.url}" referrerpolicy="no-referrer" class="w-9 h-9 rounded object-cover flex-shrink-0">
-                    <input type="text" 
-                           value="${cItem.caption || ''}" 
-                           onchange="updateCarouselCaption(${idx}, ${cItem.imgIdx}, this.value)"
-                           placeholder="輸入現況標籤，例如：${getTodayTag()}"
-                           class="w-full text-xs px-2 py-1.5 border border-slate-200 rounded-md focus:ring-2 focus:ring-emerald-500 outline-none text-slate-700 font-medium">
-                  </div>
-                `).join('')}
+                <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 mt-0.5">
+                  <span class="font-bold text-emerald-700">$${f.price}/斤</span>
+                  <span>•</span>
+                  <span class="${isLowStock ? 'text-red-600 font-bold' : ''}">庫存 ${f.stock}斤</span>
+                  <span>•</span>
+                  <span>📷 ${photoCount}張</span>
+                  ${carouselCount > 0 ? `<span class="text-emerald-700 font-bold">• 📺 ${carouselCount}輪播</span>` : ''}
+                </div>
               </div>
-            ` : ''}
-
-            <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">水果名稱</label>
-              <input type="text" value="${f.name || ''}" onchange="fruitsData[${idx}].name=this.value" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none text-base">
             </div>
+
+            <button type="button" class="px-2.5 py-1.5 rounded-xl text-xs font-bold flex-shrink-0 transition ${isExpanded ? 'bg-slate-800 text-white' : 'bg-white border border-slate-300 text-slate-700'}">
+              ${isExpanded ? '收合 ▴' : '編輯 ▾'}
+            </button>
           </div>
 
-          <!-- 單價 / 庫存 / 狀態 -->
-          <div class="grid grid-cols-3 gap-2">
-            <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">單價 (元)</label>
-              <input type="number" value="${f.price}" onchange="fruitsData[${idx}].price=Number(this.value)" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-emerald-600 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">剩餘庫存</label>
-              <input type="number" value="${f.stock !== undefined ? f.stock : 0}" onchange="fruitsData[${idx}].stock=Number(this.value)" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">上架狀態</label>
-              <select onchange="fruitsData[${idx}].status=this.value" class="w-full px-1 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 bg-white text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-                <option value="ON" ${f.status === 'ON' ? 'selected' : ''}>🟢 上架</option>
-                <option value="OFF" ${f.status === 'OFF' ? 'selected' : ''}>🔴 下架</option>
-              </select>
-            </div>
-          </div>
+          <!-- 展開後的完整編輯區塊 -->
+          ${isExpanded ? `
+            <div class="p-4 pt-3 border-t border-slate-200 bg-slate-50/70 space-y-3">
+              
+              <!-- 多圖預覽與輪播勾選 -->
+              <div class="space-y-1.5">
+                <div class="flex justify-between items-center">
+                  <label class="text-xs font-bold text-slate-600">🖼️ 商品與現況照片（共 ${photoCount} 張，點「加入輪播」可上首頁）</label>
+                </div>
+                <div class="flex items-start gap-2.5 overflow-x-auto pb-1.5 pt-1">
+                  ${renderThumbnails(f)}
+                </div>
+              </div>
 
-          <!-- 商品說明 / 備註 -->
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">商品說明 / 備註</label>
-            <textarea 
-              onchange="fruitsData[${idx}].description=this.value" 
-              rows="2" 
-              class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-xs text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500" 
-              placeholder="例如：甜度 15 度、口感酥脆、產地直送...">${f.description || ''}</textarea>
-          </div>
+              <!-- 批量上傳照片按鈕 -->
+              <div class="bg-white p-2.5 rounded-xl border border-dashed border-emerald-400 space-y-1">
+                <div class="flex justify-between items-center">
+                  <label class="block text-xs font-bold text-emerald-800">📷 新增 / 批量上傳多張照片（自動壓縮、可一次多選）</label>
+                  <span id="upload-status-${f.id}" class="text-[11px] font-bold text-emerald-600"></span>
+                </div>
+                <input type="file" accept="image/*" multiple onchange="uploadFruitImage(this, '${f.id}')" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
+              </div>
 
-          <!-- 圖片網址列表 -->
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">圖片網址列表</label>
-            <input type="text" value="${f.imageUrl || ''}" onchange="handleManualUrlChange(${idx}, this.value)" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-xs text-slate-600 outline-none focus:ring-2 focus:ring-emerald-500" placeholder="https://... , https://...">
-          </div>
+              <!-- 基本資訊編輯 -->
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">水果名稱</label>
+                <input type="text" value="${f.name || ''}" onchange="updateFruitField('${f.id}', 'name', this.value)" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+              </div>
 
-          <!-- 批量上傳圖片（自動壓縮） -->
-          <div class="bg-white p-2.5 rounded-xl border border-slate-200 space-y-1">
-            <div class="flex justify-between items-center">
-              <label class="block text-xs font-bold text-slate-600">📷 上傳現況照片 (自動壓縮、可多選)</label>
-              <span id="upload-status-${idx}" class="text-[11px] font-bold text-emerald-600"></span>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-xs font-bold text-slate-500 mb-1">單價 (元/斤)</label>
+                  <input type="number" value="${f.price}" onchange="updateFruitField('${f.id}', 'price', Number(this.value))" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-emerald-600 bg-white text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-500 mb-1">剩餘庫存 (斤)</label>
+                  <input type="number" value="${f.stock !== undefined ? f.stock : 0}" onchange="updateFruitField('${f.id}', 'stock', Number(this.value))" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 bg-white text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-500 mb-1">上架狀態</label>
+                  <select onchange="updateFruitField('${f.id}', 'status', this.value)" class="w-full px-1.5 py-1.5 border border-slate-300 rounded-lg font-bold text-slate-700 bg-white text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="ON" ${f.status === 'ON' ? 'selected' : ''}>🟢 上架</option>
+                    <option value="OFF" ${f.status === 'OFF' ? 'selected' : ''}>🔴 下架</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">商品說明 / 甜度口感備註</label>
+                <textarea onchange="updateFruitField('${f.id}', 'description', this.value)" rows="2" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs text-slate-700 bg-white outline-none focus:ring-2 focus:ring-emerald-500" placeholder="例如：甜度 15 度、口感酥脆、產地直送...">${f.description || ''}</textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">圖片網址列表（自動產生，亦可手動貼上網址以逗號分隔）</label>
+                <input type="text" value="${f.imageUrl || ''}" onchange="updateFruitField('${f.id}', 'imageUrl', this.value)" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs text-slate-600 bg-white outline-none focus:ring-2 focus:ring-emerald-500">
+              </div>
+
             </div>
-            <input type="file" accept="image/*" multiple onchange="uploadFruitImage(this, ${idx})" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
-          </div>
+          ` : ''}
+
         </div>
         `;
       }).join('');
     }
 
     function addNewFruitRow() {
-      fruitsData.push({
-        id: "F" + (fruitsData.length + 1),
+      const newId = "F" + (Date.now().toString().slice(-4));
+      fruitsData.unshift({
+        id: newId,
         name: "新品水果",
         price: 100,
         stock: 50,
@@ -440,10 +750,14 @@
         description: "",
         carouselItems: []
       });
-      renderAdminFruits();
+      expandedFruitIds.add(newId);
+      currentFruitFilter = 'ALL';
+      markUnsaved();
+      renderAllFruitUI();
     }
 
-    // 前端 Canvas 自動壓縮圖片，加快果園手機上傳與前台輪播速度
+    // ------------------- 6. 圖片壓縮與多檔上傳 -------------------
+
     function compressImageFile(file, maxWidth = 1200, quality = 0.82) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -477,37 +791,42 @@
       });
     }
 
-    async function uploadFruitImage(fileInput, idx) {
+    async function uploadFruitImage(fileInput, fruitId) {
       const files = Array.from(fileInput.files);
       if (files.length === 0) return;
 
-      const statusEl = document.getElementById(`upload-status-${idx}`);
-      if (statusEl) statusEl.innerText = `⏳ 壓縮轉檔中 (共 ${files.length} 張)...`;
+      const fruit = fruitsData.find(f => f.id === fruitId);
+      if (!fruit) return;
+
+      const statusEl = document.getElementById(`upload-status-${fruitId}`);
+      if (statusEl) statusEl.innerText = `⏳ 壓縮 ${files.length} 張照片中...`;
 
       try {
         const fileDataList = await Promise.all(files.map(file => compressImageFile(file)));
 
-        if (statusEl) statusEl.innerText = `☁️ 上傳 Google Drive 中...`;
+        if (statusEl) statusEl.innerText = `☁️ 上傳至 Google Drive 中...`;
 
         const res = await callGasApi("uploadMultipleImages", { files: fileDataList });
 
         if (res && res.status === "success" && res.urls) {
           const newUrlsStr = res.urls.join(',');
-          const existingUrls = (fruitsData[idx].imageUrl || "").trim();
+          const existingUrls = (fruit.imageUrl || "").trim();
 
-          fruitsData[idx].imageUrl = existingUrls ? `${existingUrls},${newUrlsStr}` : newUrlsStr;
-          normalizeFruitCarousel(fruitsData[idx]);
+          fruit.imageUrl = existingUrls ? `${existingUrls},${newUrlsStr}` : newUrlsStr;
+          normalizeFruitCarousel(fruit);
 
-          // 預先填入今日實拍日期標籤，方便一鍵勾選輪播
           const todayTag = getTodayTag();
           res.urls.forEach(u => {
-            const item = fruitsData[idx].carouselItems.find(x => x.url === u);
+            const item = fruit.carouselItems.find(x => x.url === u);
             if (item && !item.caption) item.caption = todayTag;
           });
 
-          if (statusEl) statusEl.innerText = `✅ 成功上傳 ${files.length} 張！(記得按儲存更新)`;
-          fileInput.value = ""; 
-          renderAdminFruits(); 
+          markUnsaved();
+          fileInput.value = "";
+          renderAllFruitUI();
+
+          const updatedStatusEl = document.getElementById(`upload-status-${fruitId}`);
+          if (updatedStatusEl) updatedStatusEl.innerText = `✅ 已新增 ${files.length} 張！`;
         } else {
           alert("圖片上傳失敗：" + (res.message || "未知錯誤"));
           if (statusEl) statusEl.innerText = "❌ 上傳失敗";
@@ -520,21 +839,22 @@
     }
 
     async function saveFruitsToBackend() {
-      const btn = document.getElementById('btn-save-fruits');
-      if (btn) {
-        btn.disabled = true;
-        btn.innerText = "⏳ 儲存中...";
+      const floatBtn = document.getElementById('btn-float-save');
+      if (floatBtn) {
+        floatBtn.disabled = true;
+        floatBtn.innerText = "⏳ 儲存中...";
       }
 
       fruitsData.forEach(f => normalizeFruitCarousel(f));
       const res = await callGasApi("updateFruits", { fruits: fruitsData });
 
-      if (btn) {
-        btn.disabled = false;
-        btn.innerText = "💾 儲存更新";
+      if (floatBtn) {
+        floatBtn.disabled = false;
+        floatBtn.innerText = "💾 立即儲存更新";
       }
 
       if (res && res.status === "success") {
+        clearUnsaved();
         alert(res.message || "水果資料與輪播設定儲存成功！");
         loadFruits();
       } else {
@@ -542,7 +862,7 @@
       }
     }
 
-    // ------------------- 訂單管理與狀態分頁 -------------------
+    // ------------------- 7. 訂單紀錄與狀態分頁 -------------------
 
     async function loadAdminOrders() {
       const res = await callGasApi("getOrders");
@@ -635,7 +955,6 @@
 
         return `
         <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
-          
           <div class="flex justify-between items-start border-b border-slate-200 pb-2">
             <div>
               <div class="font-bold text-emerald-700 text-base">${o.orderId}</div>
@@ -702,7 +1021,6 @@
           <div class="text-right font-bold text-base text-emerald-600 pt-1">
             總金額：$${o.totalAmount} 元
           </div>
-
         </div>
         `;
       }).join('');
