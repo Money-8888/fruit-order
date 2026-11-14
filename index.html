@@ -39,7 +39,7 @@
 
   <!-- 1. 首頁頂部「果園現況精選輪播看板」 -->
   <section class="max-w-5xl mx-auto sm:px-4 sm:pt-4">
-    <div id="hero-carousel" class="relative w-full h-64 sm:h-80 md:h-96 bg-slate-900 sm:rounded-2xl overflow-hidden shadow-lg select-none">
+    <div id="hero-carousel" class="relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[460px] bg-slate-900 sm:rounded-2xl overflow-hidden shadow-lg select-none">
       <!-- 輪播圖片容器 -->
       <div id="carousel-track" class="w-full h-full relative">
         <div class="w-full h-full flex flex-col items-center justify-center text-white/80 space-y-2 bg-gradient-to-br from-emerald-800 to-emerald-950">
@@ -340,17 +340,24 @@
         <div onclick="scrollToFruit('${slide.fruitId}')" 
              class="carousel-slide absolute inset-0 transition-opacity duration-500 cursor-pointer ${i === 0 ? 'opacity-100 z-[1]' : 'opacity-0 pointer-events-none'}"
              data-slide-idx="${i}">
-          <img src="${slide.url}" referrerpolicy="no-referrer" class="w-full h-full object-cover">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent"></div>
+          
+          <!-- 底層：同張照片放大模糊填滿兩側，避免直式照片出現黑邊 -->
+          <img src="${slide.url}" referrerpolicy="no-referrer" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-55">
+          
+          <!-- 前景：完整顯示整張水果實拍，完全不被裁切 -->
+          <img src="${slide.url}" referrerpolicy="no-referrer" class="relative w-full h-full object-contain z-[1]">
+          
+          <!-- 漸層遮罩確保文字清晰 -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 z-[2]"></div>
           
           <!-- 左上角現況實拍標籤 -->
-          <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5 shadow">
+          <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5 shadow z-[3]">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>${slide.caption}</span>
           </div>
 
           <!-- 左下角水果名稱與價格引導 -->
-          <div class="absolute bottom-8 left-4 right-4 text-white flex justify-between items-end">
+          <div class="absolute bottom-8 left-4 right-4 text-white flex justify-between items-end z-[3]">
             <div>
               <div class="text-lg sm:text-2xl font-extrabold drop-shadow">${slide.fruitName}</div>
               <div class="text-xs sm:text-sm text-emerald-300 font-bold">$${slide.price} 元 / 斤</div>
